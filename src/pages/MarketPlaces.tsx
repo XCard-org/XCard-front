@@ -91,7 +91,7 @@ export const MarketPlaces = (): JSX.Element => {
                 ...(newValue[nestValue]?.elements || []),
               ],
             };
-            newValue.findIndex((elem) => elem.id === parent);
+            return newValue;
           });
         } else {
           setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.id }]);
