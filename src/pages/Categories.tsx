@@ -8,7 +8,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import axios from 'axios';
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { Label } from '@radix-ui/react-label';
-import { Check } from 'lucide-react';
+import { Check, Trash } from 'lucide-react';
 
 export type Direction = {
   label: string;
@@ -32,6 +32,25 @@ export const Categories = (): JSX.Element => {
       newValue[nestValue] = direction.id;
       return newValue;
     });
+  };
+
+  const onElementDeleted = (id: string): void => {
+    axios
+      .delete(`${SERVER_ADDRESS}/api/v1/tag/`, {
+        params: {
+          id,
+        },
+        headers: {
+          Authorization: TOKEN,
+        },
+      })
+      .then(() => {
+        if (parent) {
+          setDirections((prev) => prev.filter((elem) => elem.id !== id));
+        } else {
+          setRootElements((prev) => prev.filter((elem) => elem.id !== id));
+        }
+      });
   };
 
   const onSelectDirection = (direction: Direction, nestValue: number): void => {
@@ -119,6 +138,7 @@ export const Categories = (): JSX.Element => {
             elements={rootElements}
             onElementSelected={(direction) => onElementSelected(direction, 0)}
             selectedElement={selectedElements[0]}
+            onDelete={onElementDeleted}
           />
           {directions?.map((direction, idx) =>
             direction?.isLeaf ? (
@@ -132,6 +152,7 @@ export const Categories = (): JSX.Element => {
                 onTagCreated={(title) => onTagCreated(title, direction.id, idx + 1)}
                 onElementSelected={(direction) => onElementSelected(direction, idx + 1)}
                 selectedElement={selectedElements[idx + 1]}
+                onDelete={onElementDeleted}
               />
             ),
           )}
@@ -149,6 +170,7 @@ const Category = ({
   elements,
   onElementSelected,
   selectedElement,
+  onDelete,
 }: {
   title: string;
   onCategoryClick: (direction: Direction) => void;
@@ -157,6 +179,7 @@ const Category = ({
   elements: Direction[] | undefined;
   onElementSelected: (element: Direction) => void;
   selectedElement: string;
+  onDelete: (id: string) => void;
 }): JSX.Element => {
   const onElementClick = (elem: Direction): void => {
     onCategoryClick(elem);
@@ -200,6 +223,13 @@ const Category = ({
             onClick={() => onElementClick(elem)}
           >
             {elem.label}
+            <Trash
+              className={styles.trash}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete(elem.id);
+              }}
+            />
           </div>
         ))}
       </div>

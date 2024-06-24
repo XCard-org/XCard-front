@@ -3,6 +3,7 @@ import styles from './Header.module.scss';
 import { useState } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
+import Logo from '../../assets/Logo.svg';
 
 export const Header = (): JSX.Element => {
   const location = useLocation();
@@ -39,7 +40,9 @@ export const Header = (): JSX.Element => {
   return (
     <div>
       <div className={styles.header}>
-        <div className={styles.logo}>xcard</div>
+        <div className={styles.logo}>
+          <img src={Logo} alt="logo" className={styles.logo} />
+        </div>
         <div className={styles.menu}>
           {menuItems.map((item) => (
             <div

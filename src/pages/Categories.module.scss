@@ -29,6 +29,9 @@
   width: 280px;
   border-bottom: 1px solid var(--slate-300);
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
   &:last-child {
     border-bottom: none;
@@ -37,6 +40,11 @@
   &:hover {
     background-color: var(--slate-100);
     transition: background-color 0.15s ease;
+
+    .trash {
+      opacity: 1;
+      transition: opacity 0.15s ease;
+    }
   }
 }
 
@@ -168,5 +176,12 @@
 
 .headerMoved {
   margin-bottom: 21px;
+}
+
+.trash {
+  cursor: pointer;
+  height: 16px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
 }
 
