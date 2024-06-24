@@ -1,0 +1,38 @@
+.header {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f1f5f9;
+  padding: 0 40px;
+}
+
+.logo {
+  font-size: 40px;
+  font-weight: 900;
+}
+
+.menu {
+  display: flex;
+  gap: 60px;
+  align-items: center;
+}
+
+.item {
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.itemPrimary {
+  background-color: #18181b;
+  border-radius: 5px;
+  color: white;
+  padding: 6px 12px;
+}
+
+.activeItem {
+  text-decoration: underline;
+}
+

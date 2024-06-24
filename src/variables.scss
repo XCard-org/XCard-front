@@ -1,0 +1,10 @@
+@mixin text-detail {
+  line-height: 20px;
+  font-size: 12px;
+}
+
+:root {
+  --slate-100: #f1f5f9;
+  --slate-300: #cbd5e1;
+}
+

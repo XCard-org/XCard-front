@@ -1,0 +1,40 @@
+.device {
+  width: 868px;
+  margin-top: 40px;
+  display: flex;
+  gap: 24px;
+  flex-direction: column;
+}
+
+.topBlock {
+  display: flex;
+  justify-content: space-between;
+}
+
+.category {
+  margin-bottom: 20px;
+}
+
+.tagsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tags {
+  width: 384px;
+}
+
+.tagsList {
+  display: flex;
+  gap: 20px 10px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  font-size: 12px;
+  line-height: 16px;
+  padding: 4px 8px;
+  
+}
+

@@ -1,0 +1,13 @@
+.editWrapper {
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+  height: fit-content;
+
+  &:hover {
+    background-color: #eee;
+    transition: background-color 0.15s ease;
+  }
+}
+

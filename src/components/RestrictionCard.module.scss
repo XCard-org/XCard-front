@@ -1,0 +1,22 @@
+.card {
+  width: 400px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--slate-300);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.textarea {
+  height: 90px;
+  width: 100%;
+  resize: none;
+}
+

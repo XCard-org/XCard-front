@@ -1,0 +1,48 @@
+.cards {
+  width: 836px;
+  margin-top: 40px;
+  margin-left: 60px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.headerTitle {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.cardsList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28px 36px;
+  width: 100%;
+}
+
+.card {
+  width: 400px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  border-radius: 12px;
+  border: 1px solid var(--slate-300);
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.textarea {
+  height: 90px;
+  width: 100%;
+  resize: none;
+}
+
