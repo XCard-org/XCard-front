@@ -89,17 +89,16 @@ export const Categories = (): JSX.Element => {
         if (parent) {
           setDirections((prev) => {
             const newValue = [...prev];
-            newValue[nestValue] = {
-              ...newValue[nestValue],
-              elements: [
-                { label: res.data.title, id: res.data.id },
-                ...(newValue[nestValue]?.elements || []),
-              ],
-            };
+            console.log(newValue[nestValue - 1]);
+            newValue[nestValue - 1].elements = [
+              { label: res.data.title, id: res.data.uid },
+              ...(newValue[nestValue - 1]?.elements || []),
+            ];
             newValue.findIndex((elem) => elem.id === parent);
+            return newValue;
           });
         } else {
-          setRootElements((prev) => [...prev, { label: res.data.title, id: res.data.id }]);
+          setRootElements((prev) => [...prev, { label: res.data.title, id: res.data.uid }]);
         }
       });
   };

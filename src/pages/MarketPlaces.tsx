@@ -63,7 +63,7 @@ export const MarketPlaces = (): JSX.Element => {
       .then((res) => setRootElements(getElementsFromRequest(res.data)));
   }, []);
 
-  const onTagCreated = (title: string, parent: string | undefined, nestValue: number): void => {
+  const onTagCreated = (title: string, parent: string | undefined): void => {
     axios
       .post(
         `${SERVER_ADDRESS}/api/v1/marketplace/`,
@@ -81,21 +81,7 @@ export const MarketPlaces = (): JSX.Element => {
         },
       )
       .then((res) => {
-        if (parent) {
-          setDirections((prev) => {
-            const newValue = [...prev];
-            newValue[nestValue] = {
-              ...newValue[nestValue],
-              elements: [
-                { label: res.data.name, id: res.data.id },
-                ...(newValue[nestValue]?.elements || []),
-              ],
-            };
-            return newValue;
-          });
-        } else {
-          setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.id }]);
-        }
+        setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.uid }]);
       });
   };
 
@@ -111,7 +97,7 @@ export const MarketPlaces = (): JSX.Element => {
           <Category
             title={'Маркетплейс'}
             onCategoryClick={(id) => onSelectDirection(id, 0)}
-            onTagCreated={(title) => onTagCreated(title, undefined, 0)}
+            onTagCreated={(title) => onTagCreated(title, undefined)}
             elements={rootElements}
             onElementSelected={(direction) => onElementSelected(direction, 0)}
             selectedElement={selectedElements[0]}
@@ -125,9 +111,10 @@ export const MarketPlaces = (): JSX.Element => {
                 elements={direction.elements}
                 onCategoryClick={(id) => onSelectDirection(id, idx + 1)}
                 bordered={false}
-                onTagCreated={(title) => onTagCreated(title, direction.id, idx + 1)}
+                onTagCreated={(title) => onTagCreated(title, direction.id)}
                 onElementSelected={(direction) => onElementSelected(direction, idx + 1)}
                 selectedElement={selectedElements[idx + 1]}
+                noAdd={true}
               />
             ),
           )}
@@ -145,6 +132,7 @@ const Category = ({
   elements,
   onElementSelected,
   selectedElement,
+  noAdd,
 }: {
   title: string;
   onCategoryClick: (direction: Direction) => void;
@@ -153,6 +141,7 @@ const Category = ({
   elements: Direction[] | undefined;
   onElementSelected: (element: Direction) => void;
   selectedElement: string;
+  noAdd?: true;
 }): JSX.Element => {
   const onElementClick = (elem: Direction): void => {
     onCategoryClick(elem);
@@ -167,22 +156,24 @@ const Category = ({
 
   return (
     <div className={styles.direction}>
-      <div className={styles.categoryHeader}>
+      <div className={classNames(styles.categoryHeader, noAdd && styles.headerMoved)}>
         <div className={styles.categoryTitle}>{title}</div>
-        <AddButton>
-          <div className={styles.tooltip}>
-            <div className={classNames('grid w-full max-w-sm items-center gap-1.5')}>
-              <Label htmlFor="add">Title</Label>
-              <Input
-                id="add"
-                placeholder="Title"
-                value={newValue}
-                onChange={(e) => setNewValue(e.target.value)}
-              />
+        {!noAdd && (
+          <AddButton>
+            <div className={styles.tooltip}>
+              <div className={classNames('grid w-full max-w-sm items-center gap-1.5')}>
+                <Label htmlFor="add">Title</Label>
+                <Input
+                  id="add"
+                  placeholder="Title"
+                  value={newValue}
+                  onChange={(e) => setNewValue(e.target.value)}
+                />
+              </div>
+              <Check className={styles.tooltipCheck} onClick={onSave} />
             </div>
-            <Check className={styles.tooltipCheck} onClick={onSave} />
-          </div>
-        </AddButton>
+          </AddButton>
+        )}
       </div>
       <div
         className={classNames(styles.categoriesList, !bordered && styles.categoriesListNotBordered)}

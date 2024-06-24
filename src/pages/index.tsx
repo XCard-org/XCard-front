@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Categories } from './Categories';
 import { Header } from '@/components/layout/Header';
 import { MarketPlaces } from '@/pages/MarketPlaces';
+import { Generate } from '@/pages/Generage';
 
 export const RootPaths = {
   root: '/',
@@ -26,7 +27,7 @@ export const router = createBrowserRouter([
       },
       {
         path: RootPaths.generate,
-        element: <>generate</>,
+        element: <Generate />,
       },
     ],
   },
