@@ -13,7 +13,6 @@ export const AddButton = ({
   className?: string;
   children?: JSX.Element;
 }): JSX.Element => {
-  console.log(children);
   return (
     <Popover>
       <PopoverTrigger asChild>

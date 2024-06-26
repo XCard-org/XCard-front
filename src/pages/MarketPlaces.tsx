@@ -47,6 +47,23 @@ export const MarketPlaces = (): JSX.Element => {
           ],
         },
       ]);
+    } else {
+      axios
+        .get(`${SERVER_ADDRESS}/api/v1/marketplace/${selectedElements[0]}/restriction/`, {
+          headers: {
+            Authorization: TOKEN,
+          },
+        })
+        .then((res) => {
+          setDirections((prev) => [
+            ...(prev?.slice(0, nestValue) || []),
+            {
+              label: direction.label,
+              id: direction.id,
+              elements: getElementsFromRequest(res.data),
+            },
+          ]);
+        });
     }
   };
 
@@ -64,25 +81,47 @@ export const MarketPlaces = (): JSX.Element => {
   }, []);
 
   const onTagCreated = (title: string, parent: string | undefined): void => {
-    axios
-      .post(
-        `${SERVER_ADDRESS}/api/v1/marketplace/`,
-        {
-          name: title,
-          url: 'https://www.ozon.ru/',
-        },
-        {
-          params: {
-            parent_id: parent,
+    if (!parent) {
+      axios
+        .post(
+          `${SERVER_ADDRESS}/api/v1/marketplace/`,
+          {
+            name: title,
+            url: 'https://www.ozon.ru/',
           },
-          headers: {
-            Authorization: TOKEN,
+          {
+            params: {
+              parent_id: parent,
+            },
+            headers: {
+              Authorization: TOKEN,
+            },
           },
-        },
-      )
-      .then((res) => {
-        setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.uid }]);
-      });
+        )
+        .then((res) => {
+          setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.uid }]);
+        });
+    } else {
+      axios
+        .post(
+          `${SERVER_ADDRESS}/api/v1/marketplace/`,
+          {
+            name: title,
+            url: 'https://www.ozon.ru/',
+          },
+          {
+            params: {
+              parent_id: parent,
+            },
+            headers: {
+              Authorization: TOKEN,
+            },
+          },
+        )
+        .then((res) => {
+          setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.uid }]);
+        });
+    }
   };
 
   return (
@@ -114,7 +153,7 @@ export const MarketPlaces = (): JSX.Element => {
                 onTagCreated={(title) => onTagCreated(title, direction.id)}
                 onElementSelected={(direction) => onElementSelected(direction, idx + 1)}
                 selectedElement={selectedElements[idx + 1]}
-                noAdd={true}
+                noAdd={idx === 0}
               />
             ),
           )}
@@ -141,7 +180,7 @@ const Category = ({
   elements: Direction[] | undefined;
   onElementSelected: (element: Direction) => void;
   selectedElement: string;
-  noAdd?: true;
+  noAdd?: boolean;
 }): JSX.Element => {
   const onElementClick = (elem: Direction): void => {
     onCategoryClick(elem);
