@@ -402,8 +402,7 @@ const Property = ({
   const [is_must, setIs_must] = useState<boolean>(elem.is_must || false);
   const [is_mustInitialized, setIs_mustInitialized] = useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [generation, setGeneration] = useState(elem.generation || 'Учитывать');
+  const [generation] = useState(elem.generation || 'Учитывать');
   const [generationInitialized, setGenerationInitialized] = useState(false);
   const [synonyms, setSynonyms] = useState(elem.synonyms || []);
   const [synonymsInitialized, setSynonymsInitialized] = useState(false);
