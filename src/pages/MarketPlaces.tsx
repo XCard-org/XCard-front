@@ -17,7 +17,7 @@ export const MarketPlaces = (): JSX.Element => {
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
 
   const getElementsFromRequest = (data: any): Direction[] => {
-    return data.map((elem: any) => ({ label: elem.name, id: elem.uid }));
+    return data.map((elem: any) => ({ label: elem.name || elem.key, id: elem.uid }));
   };
 
   const onElementSelected = (direction: Direction, nestValue: number): void => {
@@ -104,22 +104,27 @@ export const MarketPlaces = (): JSX.Element => {
     } else {
       axios
         .post(
-          `${SERVER_ADDRESS}/api/v1/marketplace/`,
+          `${SERVER_ADDRESS}/api/v1/marketplace/${selectedElements[0]}/restriction/`,
           {
-            name: title,
+            key: title,
             url: 'https://www.ozon.ru/',
           },
           {
-            params: {
-              parent_id: parent,
-            },
             headers: {
               Authorization: TOKEN,
             },
           },
         )
         .then((res) => {
-          setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.uid }]);
+          setDirections((prev) => {
+            const newValue = [...prev];
+            newValue[1].elements = [
+              { label: res.data.key, id: res.data.uid },
+              ...(newValue[1]?.elements || []),
+            ];
+            newValue.findIndex((elem) => elem.id === parent);
+            return newValue;
+          });
         });
     }
   };
