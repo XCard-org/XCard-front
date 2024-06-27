@@ -18,13 +18,16 @@ export const Header = (): JSX.Element => {
 
   const menuItems = [
     {
-      label: 'База знаний',
+      label: 'Общая',
       id: RootPaths.categories,
     },
     {
-      label: 'Маркетплейсы',
+      label: 'По маркетплейсам',
       id: RootPaths.marketplaces,
     },
+  ];
+
+  const headerItems = [
     {
       label: 'Сгенерировать',
       id: RootPaths.generate,
@@ -44,7 +47,7 @@ export const Header = (): JSX.Element => {
           <img src={Logo} alt="logo" className={styles.logo} />
         </div>
         <div className={styles.menu}>
-          {menuItems.map((item) => (
+          {headerItems.map((item) => (
             <div
               className={classNames(
                 styles.item,
@@ -59,9 +62,27 @@ export const Header = (): JSX.Element => {
           ))}
         </div>
       </div>
-      <div></div>
+      <div className={styles.page}>
+        <div className={styles.sidebar}>
+          <div className={styles.sidebarTitle}>База знаний</div>
+          <div className={styles.sidebarItems}>
+            {menuItems.map((item) => (
+              <div
+                className={classNames(
+                  styles.sidebarItem,
+                  item.id === currentItem && styles.sidebarActiveItem,
+                )}
+                key={item.id}
+                onClick={() => onSelect(item.id)}
+              >
+                {item.label}
+              </div>
+            ))}
+          </div>
+        </div>
 
-      <Outlet />
+        <Outlet />
+      </div>
     </div>
   );
 };

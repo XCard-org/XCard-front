@@ -7,9 +7,9 @@ import { AddButton } from '../components/AddButton';
 import { useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@radix-ui/react-label';
 import { Check } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 
 export const MarketPlaces = (): JSX.Element => {
   const [directions, setDirections] = useState<Direction[]>([]);
@@ -61,6 +61,7 @@ export const MarketPlaces = (): JSX.Element => {
               label: direction.label,
               id: direction.id,
               elements: getElementsFromRequest(res.data),
+              isLeaf: true,
             },
           ]);
         });
@@ -134,7 +135,7 @@ export const MarketPlaces = (): JSX.Element => {
       <div className={styles.menu}>
         <div className={styles.header}>
           <div className={styles.title}>
-            <h2>Маркетплейсы</h2>
+            <h2>По маркетплейсам</h2>
           </div>
         </div>
         <div className={styles.directions}>
@@ -240,7 +241,7 @@ const Category = ({
 
 const LeafCategory = ({ title }: { title: string }): JSX.Element => {
   return (
-    <div className={classNames(styles.direction, styles.lastDirection)}>
+    <div className={classNames(styles.direction, styles.lastDirection, styles.direction412)}>
       <div className={styles.categoryHeader}>
         <div className={styles.categoryTitle}>{title}</div>
         <AddButton>
@@ -252,35 +253,16 @@ const LeafCategory = ({ title }: { title: string }): JSX.Element => {
       </div>
       <div className={styles.leafCategoryList}>
         <div className={styles.leaf}>
-          <div className={styles.leafBlock}>
-            <div className={styles.leafTitle}>Features</div>
-            <div className={styles.leafInput}>
-              <div className={styles.leafInputLabel}>Feature Name</div>
-              <Input placeholder="Device" className={styles.input} />
+          <div className={styles.verticalLeaf}>
+            <div>Название ограничения</div>
+            <div className={classNames(styles.leafInput, styles.input120)}>
+              <div className={styles.leafInputLabel}>Тип</div>
+              <Input placeholder="Тип" className={styles.input} />
             </div>
-            <div className={styles.leafInput}>
-              <div className={styles.leafInputLabel}>Units</div>
-              <Input placeholder="Units" className={styles.input} />
-            </div>
-            <div className={styles.leafInputs}>
-              <div className={styles.leafInput}>
-                <div className={styles.leafInputLabel}>Is Mandatory</div>
-                <Checkbox className={styles.checkbox} />
-              </div>
-              <div className={styles.leafInput}>
-                <div className={styles.leafInputLabel}>LLM Usability</div>
-                <div className={styles.leafInputValue}>Must</div>
-              </div>
-            </div>
-          </div>
-          <div className={styles.leafBlock}>
-            <div className={styles.leafTitle}>Synonyms</div>
-            <div className={styles.synonyms}>
-              <div className={styles.synonym}>Synonym</div>
-              <div className={styles.synonym}>Synonym</div>
-              <div className={styles.synonym}>Synonym</div>
-              <div className={styles.synonym}>Synonym</div>
-            </div>
+            <Textarea
+              placeholder="Описание ограничения"
+              className={classNames('resize-none', styles.textarea)}
+            />
           </div>
         </div>
       </div>

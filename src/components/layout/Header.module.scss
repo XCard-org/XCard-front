@@ -26,8 +26,8 @@
 }
 
 .itemPrimary {
-  background-color: #18181b;
-  border-radius: 5px;
+  background-color: rgba(255, 117, 31, 1);
+  border-radius: 10px;
   color: white;
   padding: 6px 12px;
 }
@@ -38,5 +38,53 @@
 
 .logo {
   height: 40px;
+}
+
+.page {
+  display: flex;
+}
+
+.sidebar {
+  width: 220px;
+  border-right: 1px solid #eee;
+}
+
+.sidebarTitle {
+  padding: 24px 20px 12px 20px;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+
+.sidebarItems {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  padding-right: 20px;
+}
+
+.sidebarItem {
+  height: 40px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  font-weight: 500;
+
+  &:hover {
+    background-color: rgba(255, 117, 31, 0.12);
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+}
+
+.sidebarActiveItem {
+  background-color: rgba(255, 117, 31, 0.12);
+  color: rgba(255, 117, 31, 1);
 }
 

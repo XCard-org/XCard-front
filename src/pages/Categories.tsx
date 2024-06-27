@@ -224,12 +224,12 @@ export const Categories = (): JSX.Element => {
       <div className={styles.menu}>
         <div className={styles.header}>
           <div className={styles.title}>
-            <h2>База знаний</h2>
+            <h2>Общая</h2>
           </div>
         </div>
         <div className={styles.directions}>
           <Category
-            title={'Товарное направление'}
+            title={'Категория'}
             onCategoryClick={(id) => onSelectDirection(id, 0)}
             onTagCreated={(title) => onTagCreated(title, undefined, 0)}
             elements={rootElements}
