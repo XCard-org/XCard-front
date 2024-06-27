@@ -3,33 +3,62 @@ import { Categories } from './Categories';
 import { Header } from '@/components/layout/Header';
 import { MarketPlaces } from '@/pages/MarketPlaces';
 import { Generate } from '@/pages/Generage';
+import { SignIn } from '@/pages/SignIn';
+import { PrivateComponent } from '@/components/PrivateComponent';
+import { SignUp } from '@/pages/SignUp';
 
 export const RootPaths = {
   root: '/',
   categories: '/categories',
   marketplaces: '/marketplaces',
   generate: '/generate',
+  signin: '/signin',
+  signup: '/signup',
   error: '*',
 };
 
 export const router = createBrowserRouter([
   {
     path: RootPaths.root,
-    element: <Header />,
+    element: (
+      <PrivateComponent>
+        <Header />
+      </PrivateComponent>
+    ),
     children: [
       {
         path: RootPaths.categories,
-        element: <Categories />,
+        element: (
+          <PrivateComponent>
+            <Categories />
+          </PrivateComponent>
+        ),
       },
       {
         path: RootPaths.marketplaces,
-        element: <MarketPlaces />,
+        element: (
+          <PrivateComponent>
+            <MarketPlaces />
+          </PrivateComponent>
+        ),
       },
       {
         path: RootPaths.generate,
-        element: <Generate />,
+        element: (
+          <PrivateComponent>
+            <Generate />
+          </PrivateComponent>
+        ),
       },
     ],
+  },
+  {
+    path: RootPaths.signin,
+    element: <SignIn />,
+  },
+  {
+    path: RootPaths.signup,
+    element: <SignUp />,
   },
   {
     path: RootPaths.error,

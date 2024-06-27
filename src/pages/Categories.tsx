@@ -51,7 +51,7 @@ export const Categories = (): JSX.Element => {
     axios
       .delete(`${SERVER_ADDRESS}/api/v1/tag/${id}`, {
         headers: {
-          Authorization: TOKEN,
+          Authorization: TOKEN(),
         },
       })
       .then(() => {
@@ -74,7 +74,7 @@ export const Categories = (): JSX.Element => {
       axios
         .get(`${SERVER_ADDRESS}/api/v1/tag/${direction.id}/children`, {
           headers: {
-            Authorization: TOKEN,
+            Authorization: TOKEN(),
           },
         })
         .then((res) => {
@@ -91,7 +91,7 @@ export const Categories = (): JSX.Element => {
       axios
         .get(`${SERVER_ADDRESS}/api/v1/tag/${direction.id}/property`, {
           headers: {
-            Authorization: TOKEN,
+            Authorization: TOKEN(),
           },
         })
         .then((res) => {
@@ -115,7 +115,7 @@ export const Categories = (): JSX.Element => {
           root: true,
         },
         headers: {
-          Authorization: TOKEN,
+          Authorization: TOKEN(),
         },
       })
       .then((res) => setRootElements(getElementsFromRequest(res.data)));
@@ -135,7 +135,7 @@ export const Categories = (): JSX.Element => {
             parent_id: parent,
           },
           headers: {
-            Authorization: TOKEN,
+            Authorization: TOKEN(),
           },
         },
       )
@@ -170,7 +170,7 @@ export const Categories = (): JSX.Element => {
         },
         {
           headers: {
-            Authorization: TOKEN,
+            Authorization: TOKEN(),
           },
         },
       )
@@ -198,7 +198,7 @@ export const Categories = (): JSX.Element => {
     });
     axios.delete(`${SERVER_ADDRESS}/api/v1/tag/${tagId}/property/${id}`, {
       headers: {
-        Authorization: TOKEN,
+        Authorization: TOKEN(),
       },
     });
   };
@@ -213,7 +213,7 @@ export const Categories = (): JSX.Element => {
       { ...body, key: '' },
       {
         headers: {
-          Authorization: TOKEN,
+          Authorization: TOKEN(),
         },
       },
     );
@@ -534,6 +534,14 @@ const Property = ({
     setNewSynonym('');
   };
 
+  const deleteSynonym = (idx: number): void => {
+    setSynonyms((prev) => {
+      const newValue = [...prev];
+      newValue.splice(idx, 1);
+      return newValue;
+    });
+  };
+
   return (
     <div className={styles.leaf}>
       <Trash
@@ -631,8 +639,11 @@ const Property = ({
           </AddButton>
         </div>
         <div className={styles.synonyms}>
-          {synonyms.map((synonym) => (
-            <div className={styles.synonym}>{synonym}</div>
+          {synonyms.map((synonym, idx) => (
+            <div className={styles.synonym}>
+              {synonym}
+              <Trash className={styles.synonymDelete} onClick={() => deleteSynonym(idx)} />
+            </div>
           ))}
         </div>
       </div>

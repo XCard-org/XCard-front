@@ -1,5 +1,13 @@
 .add {
   height: 28px !important;
   width: 28px !important;
+
+  &:hover {
+    background-color: rgba(255, 117, 31, 0.12) !important;
+
+    svg {
+      stroke: rgba(255, 117, 31, 1) !important;
+    }
+  }
 }
 

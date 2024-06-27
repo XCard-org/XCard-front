@@ -98,7 +98,7 @@
 }
 
 .lastDirection {
-  margin-left: auto;
+  margin-left: 20px;
 }
 
 .leafTitle {
@@ -167,9 +167,18 @@
   border-bottom: 1px solid rgba(203, 213, 225, 0.4);
   padding: 10px 12px;
   font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
   &:last-child {
     border-bottom: none;
+  }
+
+  &:hover {
+    .synonymDelete {
+      opacity: 1;
+    }
   }
 }
 
@@ -236,5 +245,11 @@
 
 .textarea {
   width: 100%;
+}
+
+.synonymDelete {
+  height: 16px;
+  opacity: 0;
+  cursor: pointer;
 }
 
