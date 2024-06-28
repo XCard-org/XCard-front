@@ -10,6 +10,13 @@ import axios from 'axios';
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { Label } from '@radix-ui/react-label';
 import { Check, Trash } from 'lucide-react';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@radix-ui/react-select';
 
 export type Direction = {
   label: string;
@@ -402,7 +409,7 @@ const Property = ({
   const [is_must, setIs_must] = useState<boolean>(elem.is_must || false);
   const [is_mustInitialized, setIs_mustInitialized] = useState(false);
 
-  const [generation] = useState(elem.generation || 'Учитывать');
+  const [generation, setGeneration] = useState(elem.generation || 'Учитывать');
   const [generationInitialized, setGenerationInitialized] = useState(false);
   const [synonyms, setSynonyms] = useState(elem.synonyms || []);
   const [synonymsInitialized, setSynonymsInitialized] = useState(false);
@@ -616,7 +623,18 @@ const Property = ({
           </div>
           <div className={styles.leafInput}>
             <div className={styles.leafInputLabel}>Генерация?</div>
-            <div className={styles.leafInputValue}>Учитывать</div>
+            <div className={styles.leafInputValue}>
+              <Select value={generation} onValueChange={(value) => setGeneration(value)}>
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="light">Учитывать</SelectItem>
+                  <SelectItem value="dark">Сделать акцент</SelectItem>
+                  <SelectItem value="system">Не учитывать</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
       </div>

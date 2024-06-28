@@ -9,8 +9,9 @@ import { useCallback, useEffect, useState } from 'react';
 import classNames from 'classnames';
 import { Input } from '@/components/ui/input';
 import { Label } from '@radix-ui/react-label';
-import { Check, Trash } from 'lucide-react';
+import { Check, Pencil, Trash } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { getTextWidth } from '@/functions/measureText';
 
 export const MarketPlaces = (): JSX.Element => {
   const [directions, setDirections] = useState<Direction[]>([]);
@@ -18,7 +19,11 @@ export const MarketPlaces = (): JSX.Element => {
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
 
   const getElementsFromRequest = (data: any): Direction[] => {
-    return data.map((elem: any) => ({ label: elem.name || elem.key, id: elem.uid, ...elem }));
+    return data.map((elem: any) => ({
+      label: elem.name || elem.title || elem.key,
+      id: elem.uid,
+      ...elem,
+    }));
   };
 
   const onElementSelected = (direction: Direction, nestValue: number): void => {
@@ -66,11 +71,31 @@ export const MarketPlaces = (): JSX.Element => {
             },
           ]);
         });
-    } else {
+    } else if (direction.id === '1') {
       axios
         .get(`${SERVER_ADDRESS}/api/v1/tag/`, {
           params: {
             root: true,
+            marketplace_id: selectedElements[0],
+          },
+          headers: {
+            Authorization: TOKEN(),
+          },
+        })
+        .then((res) => {
+          setDirections((prev) => [
+            ...(prev?.slice(0, nestValue) || []),
+            {
+              label: direction.label,
+              id: direction.id,
+              elements: getElementsFromRequest(res.data),
+            },
+          ]);
+        });
+    } else {
+      axios
+        .get(`${SERVER_ADDRESS}/api/v1/tag/${direction.id}/children`, {
+          params: {
             marketplace_id: selectedElements[0],
           },
           headers: {
@@ -111,6 +136,7 @@ export const MarketPlaces = (): JSX.Element => {
           {
             name: title,
             url: 'https://www.ozon.ru/',
+            icon_url: '',
           },
           {
             params: {
@@ -156,10 +182,12 @@ export const MarketPlaces = (): JSX.Element => {
           {
             title,
             description: '',
-            is_main_kb: true,
-            marketplace_id: selectedElements[0],
+            is_main_kb: false,
           },
           {
+            params: {
+              marketplace_id: selectedElements[0],
+            },
             headers: {
               Authorization: TOKEN(),
             },
@@ -167,9 +195,10 @@ export const MarketPlaces = (): JSX.Element => {
         )
         .then((res) => {
           setDirections((prev) => {
+            console.log(res.data);
             const newValue = [...prev];
             newValue[1].elements = [
-              { label: res.data.key, id: res.data.uid },
+              { label: res.data.title, id: res.data.uid },
               ...(newValue[1]?.elements || []),
             ];
             newValue.findIndex((elem) => elem.id === parent);
@@ -378,7 +407,6 @@ const Restriction = ({
   tagId: string;
   direction: Direction;
 }): JSX.Element => {
-  console.log(direction);
   const [type, setType] = useState(direction.type || '');
   const [isTypeInitialized, setIsTypeInitialized] = useState(false);
   // const [description, setDescription] = useState();
@@ -412,10 +440,40 @@ const Restriction = ({
       clearTimeout(handler);
     };
   }, [onPropertyUpdated, type]);
+
+  const [isTitleEditing, setIsTitleEditing] = useState(false);
+  const [intermediateTitleValue, setIntermediateTitleValue] = useState(direction.label);
+
+  const saveTitle = (): void => {
+    setIsTitleEditing(false);
+    onPropertyUpdated(direction.id, { intermediateTitleValue });
+  };
+
   return (
     <div className={styles.leaf}>
       <div className={styles.verticalLeaf}>
-        <div>{direction.label}</div>
+        <div className={styles.restrictionTitle}>
+          {!isTitleEditing ? (
+            <div onDoubleClick={() => setIsTitleEditing(true)}>
+              {direction?.label?.length ? direction.label : 'Название ограничения'}
+            </div>
+          ) : (
+            <Input
+              onChange={(e) => setIntermediateTitleValue(e.target.value)}
+              value={intermediateTitleValue}
+              onBlur={saveTitle}
+              style={{
+                width: getTextWidth(
+                  intermediateTitleValue,
+                  400,
+                  14,
+                  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+                ),
+              }}
+            />
+          )}
+          <Pencil className={styles.pencil} onClick={() => setIsTitleEditing(true)} />
+        </div>
         <div className={classNames(styles.leafInput, styles.input120)}>
           <div className={styles.leafInputLabel}>Тип</div>
           <Input

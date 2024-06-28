@@ -14,39 +14,43 @@ export function SignUp() {
   const register = (values: React.FormEvent): void => {
     values.preventDefault();
 
-    axios.post(
-      `${SERVER_ADDRESS}/api/v1/user/`,
-      {
-        // @ts-expect-error exists
-        full_name: values.target.full_name.value,
-        // @ts-expect-error exists
-        personal_email: values.target.personal_email.value,
-        // @ts-expect-error exists
-        username: values.target.personal_email.value,
-        // @ts-expect-error exists
-        personal_auth_secret: values.target.personal_auth_secret.value,
-      },
-      {
-        headers: {
-          Authorization: TOKEN(),
+    axios
+      .post(
+        `${SERVER_ADDRESS}/api/v1/user/open`,
+        {
+          // @ts-expect-error exists
+          full_name: values.target.full_name.value,
+          // @ts-expect-error exists
+          personal_email: values.target.personal_email.value,
+          // @ts-expect-error exists
+          username: values.target.personal_email.value,
+          // @ts-expect-error exists
+          personal_auth_secret: values.target.personal_auth_secret.value,
         },
-      },
-    );
+        {
+          headers: {
+            Authorization: TOKEN(),
+          },
+        },
+      )
+      .then(() => {
+        navigate(RootPaths.signin);
+      });
   };
 
   return (
     <form className={styles.form} onSubmit={register}>
       <Card className="mx-auto max-w-sm">
         <CardHeader>
-          <CardTitle className="text-xl">Sign Up</CardTitle>
-          <CardDescription>Enter your information to create an account</CardDescription>
+          <CardTitle className="text-xl">Регистрация</CardTitle>
+          <CardDescription>Введите информацию для создания аккаунта</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
-                <Label htmlFor="full_name">Full name</Label>
-                <Input id="full_name" placeholder="Max Robinson" required />
+                <Label htmlFor="full_name">Имя</Label>
+                <Input id="full_name" placeholder="Захар Давыдов" required />
               </div>
             </div>
             <div className="grid gap-2">
@@ -59,15 +63,15 @@ export function SignUp() {
               />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="personal_auth_secret">Password</Label>
+              <Label htmlFor="personal_auth_secret">Пароль</Label>
               <Input id="personal_auth_secret" type="password" />
             </div>
             <Button type="submit" className="w-full">
-              Create an account
+              Создать аккаунт
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Already have an account?{' '}
+            Уже зарегистрированы?{' '}
             <a
               href={RootPaths.signin}
               onClick={(e) => {
@@ -76,7 +80,7 @@ export function SignUp() {
               }}
               className="underline"
             >
-              Sign in
+              Войти
             </a>
           </div>
         </CardContent>

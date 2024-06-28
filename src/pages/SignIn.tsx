@@ -40,8 +40,8 @@ export function SignIn() {
     <div className={styles.form}>
       <Card className="mx-auto max-w-sm">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
-          <CardDescription>Enter your email below to login to your account</CardDescription>
+          <CardTitle className="text-2xl">Авторизация</CardTitle>
+          <CardDescription>Введите ваш email ниже для авторизации</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid gap-4">
@@ -57,7 +57,7 @@ export function SignIn() {
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">Пароль</Label>
               </div>
               <Input
                 id="password"
@@ -67,11 +67,11 @@ export function SignIn() {
               />
             </div>
             <Button type="submit" className="w-full" onClick={() => login()}>
-              Login
+              Войти
             </Button>
           </div>
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{' '}
+            Не зарегистрированы?{' '}
             <a
               href={RootPaths.signin}
               onClick={(e) => {
@@ -80,7 +80,7 @@ export function SignIn() {
               }}
               className="underline"
             >
-              Sign up
+              Регистрация
             </a>
           </div>
         </CardContent>
