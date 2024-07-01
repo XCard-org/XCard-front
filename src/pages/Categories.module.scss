@@ -88,6 +88,7 @@
   gap: 20px;
   padding: 20px;
   position: relative;
+  min-width: 416px;
 
   &:hover {
     .trashLeaf {
@@ -239,11 +240,18 @@
   width: 120px;
 }
 
+.inputArea {
+  width: 100%;
+  max-height: unset;
+}
+
 .direction412 {
   width: 412px;
 }
 
 .textarea {
+  width: 100%;
+  padding-top: 14px !important;
   width: 100%;
 }
 
@@ -263,5 +271,13 @@
 .pencil {
   height: 12px;
   cursor: pointer;
+}
+
+.nameInput {
+  font-weight: 400;
+  padding: 4px 6px !important;
+  height: 24px !important;
+  font-size: 16px !important;
+  margin-left: -7px;
 }
 

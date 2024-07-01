@@ -35,6 +35,8 @@ export type Direction = {
   unit_of_measure?: string;
   is_must?: boolean;
   value?: string;
+  allowed?: string;
+  not_allowed?: string;
 };
 
 export const Categories = (): JSX.Element => {
@@ -150,7 +152,6 @@ export const Categories = (): JSX.Element => {
         if (parent) {
           setDirections((prev) => {
             const newValue = [...prev];
-            console.log(newValue[nestValue - 1]);
             newValue[nestValue - 1].elements = [
               { label: res.data.title, id: res.data.uid },
               ...(newValue[nestValue - 1]?.elements || []),
@@ -404,7 +405,7 @@ const Property = ({
   const [min_valueInitialized, setMin_valueInitialized] = useState(false);
   const [max_value, setMax_value] = useState(elem.max_value || 0);
   const [max_valueInitialized, setMax_valueInitialized] = useState(false);
-  const [value, setValue] = useState(elem.value || '');
+  const [value, setValue] = useState(elem.value || '-');
   const [valueInitialized, setValueInitialized] = useState(false);
   const [is_must, setIs_must] = useState<boolean>(elem.is_must || false);
   const [is_mustInitialized, setIs_mustInitialized] = useState(false);
@@ -624,9 +625,13 @@ const Property = ({
           <div className={styles.leafInput}>
             <div className={styles.leafInputLabel}>Генерация?</div>
             <div className={styles.leafInputValue}>
-              <Select value={generation} onValueChange={(value) => setGeneration(value)}>
+              <Select
+                value={generation}
+                defaultValue={'Учитывать'}
+                onValueChange={(value) => setGeneration(value)}
+              >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue />
+                  <SelectValue defaultValue={'Учитывать'} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="light">Учитывать</SelectItem>
@@ -656,14 +661,16 @@ const Property = ({
             </div>
           </AddButton>
         </div>
-        <div className={styles.synonyms}>
-          {synonyms.map((synonym, idx) => (
-            <div className={styles.synonym}>
-              {synonym}
-              <Trash className={styles.synonymDelete} onClick={() => deleteSynonym(idx)} />
-            </div>
-          ))}
-        </div>
+        {synonyms?.length ? (
+          <div className={styles.synonyms}>
+            {synonyms.map((synonym, idx) => (
+              <div className={styles.synonym}>
+                {synonym}
+                <Trash className={styles.synonymDelete} onClick={() => deleteSynonym(idx)} />
+              </div>
+            ))}
+          </div>
+        ) : null}
       </div>
     </div>
   );

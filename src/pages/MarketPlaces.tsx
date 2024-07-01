@@ -128,7 +128,7 @@ export const MarketPlaces = (): JSX.Element => {
       .then((res) => setRootElements(getElementsFromRequest(res.data)));
   }, []);
 
-  const onTagCreated = (title: string, parent: string | undefined): void => {
+  const onTagCreated = (title: string, parent: string | undefined, nestValue: number): void => {
     if (!parent) {
       axios
         .post(
@@ -187,6 +187,7 @@ export const MarketPlaces = (): JSX.Element => {
           {
             params: {
               marketplace_id: selectedElements[0],
+              parent_id: nestValue >= 2 ? parent : undefined,
             },
             headers: {
               Authorization: TOKEN(),
@@ -195,13 +196,12 @@ export const MarketPlaces = (): JSX.Element => {
         )
         .then((res) => {
           setDirections((prev) => {
-            console.log(res.data);
             const newValue = [...prev];
-            newValue[1].elements = [
+            newValue[nestValue - 1].elements = [
               { label: res.data.title, id: res.data.uid },
-              ...(newValue[1]?.elements || []),
+              ...(newValue[nestValue - 1]?.elements || []),
             ];
-            newValue.findIndex((elem) => elem.id === parent);
+
             return newValue;
           });
         });
@@ -242,7 +242,7 @@ export const MarketPlaces = (): JSX.Element => {
           <Category
             title={'Маркетплейс'}
             onCategoryClick={(id) => onSelectDirection(id, 0)}
-            onTagCreated={(title) => onTagCreated(title, undefined)}
+            onTagCreated={(title) => onTagCreated(title, undefined, 0)}
             elements={rootElements}
             onElementSelected={(direction) => onElementSelected(direction, 0)}
             selectedElement={selectedElements[0]}
@@ -252,7 +252,7 @@ export const MarketPlaces = (): JSX.Element => {
             direction?.isLeaf ? (
               <LeafCategory
                 direction={direction}
-                onTagCreated={(title) => onTagCreated(title, direction.id)}
+                onTagCreated={(title) => onTagCreated(title, direction.id, idx + 1)}
                 key={direction.id}
               />
             ) : (
@@ -261,7 +261,7 @@ export const MarketPlaces = (): JSX.Element => {
                 elements={direction.elements}
                 onCategoryClick={(id) => onSelectDirection(id, idx + 1)}
                 bordered={false}
-                onTagCreated={(title) => onTagCreated(title, direction.id)}
+                onTagCreated={(title) => onTagCreated(title, direction.id, idx + 1)}
                 onElementSelected={(direction) => onElementSelected(direction, idx + 1)}
                 selectedElement={selectedElements[idx + 1]}
                 noAdd={idx === 0}
@@ -409,13 +409,17 @@ const Restriction = ({
 }): JSX.Element => {
   const [type, setType] = useState(direction.type || '');
   const [isTypeInitialized, setIsTypeInitialized] = useState(false);
-  // const [description, setDescription] = useState();
+  const [allowed, setAllowed] = useState(direction.allowed || '');
+  const [isAllowedInitialized, setIsAllowedInitialized] = useState(false);
+  const [not_allowed, setNot_allowed] = useState(direction.not_allowed || '');
+  const [isNotAllowedInitialized, setIsNotAllowedInitialized] = useState(false);
 
   const onPropertyUpdated = useCallback(
     (id: string, body: Record<string, string | Array<string> | boolean | number>): void => {
+      console.log(body);
       axios.put(
         `${SERVER_ADDRESS}/api/v1/marketplace/${tagId}/restriction/${id}`,
-        { ...body, key: '' },
+        { ...body },
         {
           headers: {
             Authorization: TOKEN(),
@@ -441,12 +445,42 @@ const Restriction = ({
     };
   }, [onPropertyUpdated, type]);
 
+  useEffect(() => {
+    let handler: ReturnType<typeof setTimeout>;
+    if (isAllowedInitialized) {
+      handler = setTimeout(() => {
+        onPropertyUpdated(direction.id, { allowed });
+      }, 300);
+    } else {
+      setIsAllowedInitialized(true);
+    }
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [onPropertyUpdated, allowed]);
+
+  useEffect(() => {
+    let handler: ReturnType<typeof setTimeout>;
+    if (isNotAllowedInitialized) {
+      handler = setTimeout(() => {
+        onPropertyUpdated(direction.id, { not_allowed });
+      }, 300);
+    } else {
+      setIsNotAllowedInitialized(true);
+    }
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [onPropertyUpdated, not_allowed]);
+
   const [isTitleEditing, setIsTitleEditing] = useState(false);
   const [intermediateTitleValue, setIntermediateTitleValue] = useState(direction.label);
 
   const saveTitle = (): void => {
     setIsTitleEditing(false);
-    onPropertyUpdated(direction.id, { intermediateTitleValue });
+    onPropertyUpdated(direction.id, { key: intermediateTitleValue });
   };
 
   return (
@@ -454,25 +488,30 @@ const Restriction = ({
       <div className={styles.verticalLeaf}>
         <div className={styles.restrictionTitle}>
           {!isTitleEditing ? (
-            <div onDoubleClick={() => setIsTitleEditing(true)}>
-              {direction?.label?.length ? direction.label : 'Название ограничения'}
-            </div>
+            <>
+              <div onDoubleClick={() => setIsTitleEditing(true)}>
+                {intermediateTitleValue?.length ? intermediateTitleValue : 'Название ограничения'}
+              </div>
+              <Pencil className={styles.pencil} onClick={() => setIsTitleEditing(true)} />
+            </>
           ) : (
             <Input
               onChange={(e) => setIntermediateTitleValue(e.target.value)}
               value={intermediateTitleValue}
               onBlur={saveTitle}
+              autoFocus={true}
               style={{
-                width: getTextWidth(
-                  intermediateTitleValue,
-                  400,
-                  14,
-                  'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-                ),
+                width:
+                  getTextWidth(
+                    intermediateTitleValue,
+                    400,
+                    16,
+                    'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+                  ) + 20,
               }}
+              className={styles.nameInput}
             />
           )}
-          <Pencil className={styles.pencil} onClick={() => setIsTitleEditing(true)} />
         </div>
         <div className={classNames(styles.leafInput, styles.input120)}>
           <div className={styles.leafInputLabel}>Тип</div>
@@ -483,10 +522,24 @@ const Restriction = ({
             onChange={(e) => setType(e.target.value)}
           />
         </div>
-        <Textarea
-          placeholder="Описание ограничения"
-          className={classNames('resize-none', styles.textarea)}
-        />
+        <div className={classNames(styles.leafInput, styles.inputArea)}>
+          <div className={styles.leafInputLabel}>Разрешено</div>
+          <Textarea
+            placeholder="Описание"
+            className={classNames('resize-none', styles.textarea)}
+            value={allowed}
+            onChange={(e) => setAllowed(e.target.value)}
+          />
+        </div>
+        <div className={classNames(styles.leafInput, styles.inputArea)}>
+          <div className={styles.leafInputLabel}>Не разрешено</div>
+          <Textarea
+            placeholder="Описание"
+            className={classNames('resize-none', styles.textarea)}
+            value={not_allowed}
+            onChange={(e) => setNot_allowed(e.target.value)}
+          />
+        </div>
       </div>
     </div>
   );
