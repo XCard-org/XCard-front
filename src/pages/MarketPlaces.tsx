@@ -12,8 +12,12 @@ import { Label } from '@radix-ui/react-label';
 import { Check, Pencil, Trash } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { getTextWidth } from '@/functions/measureText';
+import { useNavigate } from 'react-router';
+import { RootPaths } from '@/pages';
+import { createSearchParams } from 'react-router-dom';
 
 export const MarketPlaces = (): JSX.Element => {
+  const navigate = useNavigate();
   const [directions, setDirections] = useState<Direction[]>([]);
   const [rootElements, setRootElements] = useState<Direction[]>([]);
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
@@ -92,7 +96,7 @@ export const MarketPlaces = (): JSX.Element => {
             },
           ]);
         });
-    } else {
+    } else if (nestValue < 4) {
       axios
         .get(`${SERVER_ADDRESS}/api/v1/tag/${direction.id}/children`, {
           params: {
@@ -112,6 +116,14 @@ export const MarketPlaces = (): JSX.Element => {
             },
           ]);
         });
+    } else {
+      navigate({
+        pathname: RootPaths.category,
+        search: createSearchParams({
+          id: selectedElements[selectedElements.length - 1],
+          marketId: selectedElements[0],
+        }).toString(),
+      });
     }
   };
 

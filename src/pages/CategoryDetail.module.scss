@@ -1,0 +1,20 @@
+.categories {
+  width: fit-content;
+  border: 1px solid #eee;
+  margin-left: -1px;
+}
+
+.categoryItem {
+  padding: 12px 16px;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  width: 200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+

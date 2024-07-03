@@ -88,3 +88,14 @@
   color: rgba(255, 117, 31, 1);
 }
 
+.page {
+  display: flex;
+  height: 100%;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+

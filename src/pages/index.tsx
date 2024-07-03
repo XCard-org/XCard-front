@@ -6,12 +6,16 @@ import { Generate } from '@/pages/Generage';
 import { SignIn } from '@/pages/SignIn';
 import { PrivateComponent } from '@/components/PrivateComponent';
 import { SignUp } from '@/pages/SignUp';
+import { Category } from '@/pages/Category';
+import { CategoryDetail } from '@/pages/CategoryDetail';
 
 export const RootPaths = {
   root: '/',
   categories: '/categories',
+  category: '/category',
   marketplaces: '/marketplaces',
   generate: '/generate',
+  detail: '/detail',
   signin: '/signin',
   signup: '/signup',
   error: '*',
@@ -47,6 +51,22 @@ export const router = createBrowserRouter([
         element: (
           <PrivateComponent>
             <Generate />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.category,
+        element: (
+          <PrivateComponent>
+            <Category />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.detail,
+        element: (
+          <PrivateComponent>
+            <CategoryDetail />
           </PrivateComponent>
         ),
       },

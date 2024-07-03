@@ -350,7 +350,7 @@ const Category = ({
   );
 };
 
-const LeafCategory = ({
+export const LeafCategory = ({
   direction,
   onPropertyCreated,
   onDelete,
@@ -387,7 +387,7 @@ const LeafCategory = ({
   );
 };
 
-const Property = ({
+export const Property = ({
   elem,
   onDelete,
   onPropertyUpdated,

@@ -41,7 +41,7 @@ export const Header = (): JSX.Element => {
   };
 
   return (
-    <div>
+    <div className={styles.app}>
       <div className={styles.header}>
         <div className={styles.logo}>
           <img src={Logo} alt="logo" className={styles.logo} />
