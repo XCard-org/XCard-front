@@ -1,9 +1,24 @@
 import { Input } from '@/components/ui/input';
 import styles from './Scrape.module.scss';
 import { useState } from 'react';
+import axios from 'axios';
+import { SERVER_ADDRESS } from '@/constants';
+import { useNavigate } from 'react-router';
+import { RootPaths } from '@/pages';
 
 export const Scrape = (): JSX.Element => {
   const [link, setLink] = useState('');
+  const navigate = useNavigate();
+
+  const onStart = (): void => {
+    axios
+      .post(`${SERVER_ADDRESS}/api/v1/card/?queue_scraping=true`, {
+        source_url: link,
+      })
+      .then(() => {
+        navigate(RootPaths.source);
+      });
+  };
 
   return (
     <div className={styles.scrape}>
@@ -22,7 +37,9 @@ export const Scrape = (): JSX.Element => {
             onChange={(e) => setLink(e.target.value)}
           />
         </div>
-        <div className={styles.start}>Запустить</div>
+        <div className={styles.start} onClick={onStart}>
+          Запустить
+        </div>
       </div>
     </div>
   );

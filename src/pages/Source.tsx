@@ -14,7 +14,16 @@ import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
 
 export const Source = (): JSX.Element => {
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<
+    Array<{
+      uid: string;
+      title: string;
+      manufacturer_id: string;
+      manufacturer_url: string;
+      price: number;
+      currency: string;
+    }>
+  >([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +33,7 @@ export const Source = (): JSX.Element => {
           Authorization: TOKEN(),
         },
       })
+      // @ts-expect-error no err
       .then((res) => setData(res.data.map((elem) => elem)));
   }, []);
 
@@ -46,16 +56,18 @@ export const Source = (): JSX.Element => {
             <TableHead>Артикул</TableHead>
             <TableHead>Бренд</TableHead>
             <TableHead>Ссылка</TableHead>
-            <TableHead>Категория</TableHead>
+            <TableHead>Цена</TableHead>
+            <TableHead>Валюта</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {data.map((elem) => (
-            <TableRow key={elem.invoice}>
-              <TableCell className="font-medium">{elem.invoice}</TableCell>
-              <TableCell>{elem.paymentStatus}</TableCell>
-              <TableCell>{elem.paymentMethod}</TableCell>
-              <TableCell className="text-right">{elem.totalAmount}</TableCell>
+            <TableRow key={elem.uid}>
+              <TableCell>{elem.title}</TableCell>
+              <TableCell>{elem.manufacturer_id}</TableCell>
+              <TableCell>{elem.manufacturer_url}</TableCell>
+              <TableCell>{elem.price}</TableCell>
+              <TableCell>{elem.currency}</TableCell>
             </TableRow>
           ))}
         </TableBody>
