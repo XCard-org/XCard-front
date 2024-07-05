@@ -34,14 +34,6 @@ export const Header = (): JSX.Element => {
     },
   ];
 
-  const headerItems = [
-    {
-      label: 'Сгенерировать',
-      id: RootPaths.generate,
-      className: styles.itemPrimary,
-    },
-  ];
-
   const onSelect = (id: string): void => {
     setCurrentItem(id);
     navigate(id);
@@ -52,21 +44,6 @@ export const Header = (): JSX.Element => {
       <div className={styles.header}>
         <div className={styles.logo}>
           <img src={Logo} alt="logo" className={styles.logo} />
-        </div>
-        <div className={styles.menu}>
-          {headerItems.map((item) => (
-            <div
-              className={classNames(
-                styles.item,
-                item?.className,
-                item.id === currentItem && styles.activeItem,
-              )}
-              key={item.id}
-              onClick={() => onSelect(item.id)}
-            >
-              {item.label}
-            </div>
-          ))}
         </div>
       </div>
       <div className={styles.page}>
