@@ -118,10 +118,9 @@ export const MarketPlaces = (): JSX.Element => {
         });
     } else {
       navigate({
-        pathname: RootPaths.category,
+        pathname: RootPaths.detail,
         search: createSearchParams({
           id: selectedElements[selectedElements.length - 1],
-          marketId: selectedElements[0],
         }).toString(),
       });
     }
@@ -207,15 +206,24 @@ export const MarketPlaces = (): JSX.Element => {
           },
         )
         .then((res) => {
-          setDirections((prev) => {
-            const newValue = [...prev];
-            newValue[nestValue - 1].elements = [
-              { label: res.data.title, id: res.data.uid },
-              ...(newValue[nestValue - 1]?.elements || []),
-            ];
+          if (nestValue < 4) {
+            setDirections((prev) => {
+              const newValue = [...prev];
+              newValue[nestValue - 1].elements = [
+                { label: res.data.title, id: res.data.uid },
+                ...(newValue[nestValue - 1]?.elements || []),
+              ];
 
-            return newValue;
-          });
+              return newValue;
+            });
+          } else {
+            navigate({
+              pathname: RootPaths.category,
+              search: createSearchParams({
+                id: selectedElements[selectedElements.length - 1],
+              }).toString(),
+            });
+          }
         });
     }
   };
@@ -428,7 +436,6 @@ const Restriction = ({
 
   const onPropertyUpdated = useCallback(
     (id: string, body: Record<string, string | Array<string> | boolean | number>): void => {
-      console.log(body);
       axios.put(
         `${SERVER_ADDRESS}/api/v1/marketplace/${tagId}/restriction/${id}`,
         { ...body },

@@ -18,3 +18,22 @@
   }
 }
 
+.content {
+  display: flex;
+  gap: 20px;
+}
+
+.leaf {
+  flex-grow: 1;
+}
+
+.tags {
+  min-width: 256px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+

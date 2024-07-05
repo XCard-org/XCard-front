@@ -9,7 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import axios from 'axios';
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { Label } from '@radix-ui/react-label';
-import { Check, Trash } from 'lucide-react';
+import { Check, Pencil, Trash } from 'lucide-react';
 import {
   Select,
   SelectContent,
@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@radix-ui/react-select';
+import { getTextWidth } from '@/functions/measureText';
 
 export type Direction = {
   label: string;
@@ -37,16 +38,18 @@ export type Direction = {
   value?: string;
   allowed?: string;
   not_allowed?: string;
+  llm_usability?: string;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const getElementsFromRequest = (data: any): Direction[] => {
+  return data.map((elem: any) => ({ label: elem.title || elem.key, id: elem.uid, ...elem }));
 };
 
 export const Categories = (): JSX.Element => {
   const [directions, setDirections] = useState<Direction[]>([]);
   const [rootElements, setRootElements] = useState<Direction[]>([]);
   const [selectedElements, setSelectedElements] = useState<string[]>([]);
-
-  const getElementsFromRequest = (data: any): Direction[] => {
-    return data.map((elem: any) => ({ label: elem.title, id: elem.uid, ...elem }));
-  };
 
   const onElementSelected = (direction: Direction, nestValue: number): void => {
     setSelectedElements((prev) => {
@@ -212,13 +215,14 @@ export const Categories = (): JSX.Element => {
   };
 
   const onPropertyUpdated = (
+    key: string,
     tagId: string,
     id: string,
     body: Record<string, string | Array<string> | boolean | number>,
   ): void => {
     axios.put(
       `${SERVER_ADDRESS}/api/v1/tag/${tagId}/property/${id}`,
-      { ...body, key: '' },
+      { ...body, key: body.key || key },
       {
         headers: {
           Authorization: TOKEN(),
@@ -252,7 +256,9 @@ export const Categories = (): JSX.Element => {
                 key={direction.id}
                 onPropertyCreated={() => onPropertyCreated(direction.id)}
                 onDelete={(id) => onPropertyDeleted(direction.id, id)}
-                onPropertyUpdated={(id, body) => onPropertyUpdated(direction.id, id, body)}
+                onPropertyUpdated={(id, body) =>
+                  onPropertyUpdated(direction.label, direction.id, id, body)
+                }
               />
             ) : (
               <Category
@@ -355,31 +361,36 @@ export const LeafCategory = ({
   onPropertyCreated,
   onDelete,
   onPropertyUpdated,
+  onPropertySelected,
 }: {
   direction: Direction;
-  onPropertyCreated: () => void;
-  onDelete: (id: string) => void;
-  onPropertyUpdated: (
+  onPropertyCreated?: () => void;
+  onDelete?: (id: string) => void;
+  onPropertyUpdated?: (
     id: string,
     body: Record<string, string | Array<string> | boolean | number>,
   ) => void;
+  onPropertySelected?: (id: string) => void;
 }): JSX.Element => {
   const onSave = (): void => {
-    onPropertyCreated();
+    onPropertyCreated?.();
   };
 
   return (
     <div className={classNames(styles.direction, styles.lastDirection)}>
       <div className={styles.categoryHeader}>
         <div className={styles.categoryTitle}>{direction.label}</div>
-        <AddButton onClick={onSave} />
+        {onPropertyUpdated && <AddButton onClick={onSave} />}
       </div>
       <div className={styles.leafCategoryList}>
         {direction?.elements?.map((elem) => (
           <Property
             elem={elem}
-            onDelete={() => onDelete(elem.id)}
-            onPropertyUpdated={(body) => onPropertyUpdated(elem.id, body)}
+            onDelete={() => onDelete?.(elem.id)}
+            onPropertyUpdated={
+              onPropertyUpdated ? (body) => onPropertyUpdated?.(elem.id, body) : undefined
+            }
+            onPropertySelected={onPropertySelected}
           />
         ))}
       </div>
@@ -391,12 +402,13 @@ export const Property = ({
   elem,
   onDelete,
   onPropertyUpdated,
+  onPropertySelected,
 }: {
   elem: Direction;
   onDelete: () => void;
-  onPropertyUpdated: (body: Record<string, string | Array<string> | boolean | number>) => void;
+  onPropertyUpdated?: (body: Record<string, string | Array<string> | boolean | number>) => void;
+  onPropertySelected?: (id: string) => void;
 }): JSX.Element => {
-  console.log(elem);
   const [value_type, setValue_type] = useState(elem.value_type || '');
   const [typeInitialized, setTypeInitialized] = useState(false);
   const [unit_of_measure, setUnit_of_measure] = useState(elem.unit_of_measure || '');
@@ -410,7 +422,7 @@ export const Property = ({
   const [is_must, setIs_must] = useState<boolean>(elem.is_must || false);
   const [is_mustInitialized, setIs_mustInitialized] = useState(false);
 
-  const [generation, setGeneration] = useState(elem.generation || 'Учитывать');
+  const [llm_usability, setLlm_usability] = useState(elem.llm_usability || 'Учитывать');
   const [generationInitialized, setGenerationInitialized] = useState(false);
   const [synonyms, setSynonyms] = useState(elem.synonyms || []);
   const [synonymsInitialized, setSynonymsInitialized] = useState(false);
@@ -419,7 +431,7 @@ export const Property = ({
     let handler: ReturnType<typeof setTimeout>;
     if (typeInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ value_type });
+        onPropertyUpdated?.({ value_type });
       }, 300);
     } else {
       setTypeInitialized(true);
@@ -434,7 +446,7 @@ export const Property = ({
     let handler: ReturnType<typeof setTimeout>;
     if (unit_of_measureInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ unit_of_measure });
+        onPropertyUpdated?.({ unit_of_measure });
       }, 300);
     } else {
       setUnit_of_measureInitialized(true);
@@ -449,7 +461,7 @@ export const Property = ({
     let handler: ReturnType<typeof setTimeout>;
     if (min_valueInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ min_value });
+        onPropertyUpdated?.({ min_value });
       }, 300);
     } else {
       setMin_valueInitialized(true);
@@ -464,7 +476,7 @@ export const Property = ({
     let handler: ReturnType<typeof setTimeout>;
     if (max_valueInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ max_value });
+        onPropertyUpdated?.({ max_value });
       }, 300);
     } else {
       setMax_valueInitialized(true);
@@ -479,7 +491,7 @@ export const Property = ({
     let handler: ReturnType<typeof setTimeout>;
     if (is_mustInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ is_must });
+        onPropertyUpdated?.({ is_must });
       }, 300);
     } else {
       setIs_mustInitialized(true);
@@ -494,7 +506,7 @@ export const Property = ({
     let handler: ReturnType<typeof setTimeout>;
     if (generationInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ generation });
+        onPropertyUpdated?.({ llm_usability });
       }, 300);
     } else {
       setGenerationInitialized(true);
@@ -503,13 +515,13 @@ export const Property = ({
     return () => {
       clearTimeout(handler);
     };
-  }, [generation, onPropertyUpdated]);
+  }, [llm_usability, onPropertyUpdated]);
 
   useEffect(() => {
     let handler: ReturnType<typeof setTimeout>;
     if (synonymsInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ synonyms });
+        onPropertyUpdated?.({ synonyms });
       }, 300);
     } else {
       setSynonymsInitialized(true);
@@ -524,7 +536,7 @@ export const Property = ({
     let handler: ReturnType<typeof setTimeout>;
     if (valueInitialized) {
       handler = setTimeout(() => {
-        onPropertyUpdated({ value });
+        onPropertyUpdated?.({ value });
       }, 300);
     } else {
       setValueInitialized(true);
@@ -550,17 +562,86 @@ export const Property = ({
     });
   };
 
+  const selectElem = (): void => {
+    if (onPropertySelected) {
+      onPropertySelected(elem.id);
+      setSelected((prev) => !prev);
+    }
+  };
+
+  const [selected, setSelected] = useState(false);
+
+  const [isTitleEditing, setIsTitleEditing] = useState(false);
+  const [intermediateTitleValue, setIntermediateTitleValue] = useState(
+    elem.label || 'Название ключа',
+  );
+
+  const saveTitle = (): void => {
+    setIsTitleEditing(false);
+    onPropertyUpdated?.({ key: intermediateTitleValue });
+  };
+
+  const getGenerationValue = (): string => {
+    switch (llm_usability) {
+      case 'must':
+        return 'Учитывать';
+      case 'accent':
+        return 'Сделать акцент';
+      case 'optional':
+        return 'Не учитывать';
+      default:
+        return 'Учитывать';
+    }
+  };
+
   return (
-    <div className={styles.leaf}>
-      <Trash
-        className={styles.trashLeaf}
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-      />
+    <div
+      className={classNames(
+        styles.leaf,
+        selected && styles.leafSelected,
+        onPropertySelected && styles.leafSelectable,
+      )}
+      onClick={selectElem}
+    >
+      {onPropertyUpdated && (
+        <Trash
+          className={styles.trashLeaf}
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+        />
+      )}
       <div className={styles.leafBlock}>
-        <div className={styles.leafTitle}>Название ключа</div>
+        <div className={styles.leafTitle}>
+          {!isTitleEditing ? (
+            <>
+              <div onDoubleClick={onPropertyUpdated ? () => setIsTitleEditing(true) : undefined}>
+                {intermediateTitleValue?.length ? intermediateTitleValue : 'Название ограничения'}
+              </div>
+              {onPropertyUpdated && (
+                <Pencil className={styles.pencil} onClick={() => setIsTitleEditing(true)} />
+              )}
+            </>
+          ) : (
+            <Input
+              onChange={(e) => setIntermediateTitleValue(e.target.value)}
+              value={intermediateTitleValue}
+              onBlur={saveTitle}
+              autoFocus={true}
+              style={{
+                width:
+                  getTextWidth(
+                    intermediateTitleValue,
+                    400,
+                    16,
+                    'ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
+                  ) + 20,
+              }}
+              className={styles.nameInput}
+            />
+          )}
+        </div>
         <div className={styles.leafInput}>
           <div className={styles.leafInputLabel}>Тип характеристики</div>
 
@@ -569,6 +650,7 @@ export const Property = ({
             className={styles.input}
             onChange={(e) => setValue_type(e.target.value)}
             value={value_type}
+            disabled={!onPropertyUpdated}
           />
         </div>
 
@@ -579,6 +661,7 @@ export const Property = ({
             className={styles.input}
             onChange={(e) => setUnit_of_measure(e.target.value)}
             value={unit_of_measure}
+            disabled={!onPropertyUpdated}
           />
         </div>
 
@@ -590,6 +673,7 @@ export const Property = ({
               className={styles.input}
               onChange={(e) => setMin_value(parseFloat(e.target.value))}
               value={min_value}
+              disabled={!onPropertyUpdated}
             />
           </div>
           <div className={styles.leafInput}>
@@ -599,6 +683,7 @@ export const Property = ({
               className={styles.input}
               onChange={(e) => setMax_value(parseFloat(e.target.value))}
               value={max_value}
+              disabled={!onPropertyUpdated}
             />
           </div>
         </div>
@@ -610,6 +695,7 @@ export const Property = ({
             className={styles.input}
             onChange={(e) => setValue(e.target.value)}
             value={value}
+            disabled={!onPropertyUpdated}
           />
         </div>
         <div className={styles.leafInputs}>
@@ -620,23 +706,30 @@ export const Property = ({
               checked={is_must}
               // @ts-expect-error no err
               onCheckedChange={(e) => setIs_must(e)}
+              disabled={!onPropertyUpdated}
             />
           </div>
           <div className={styles.leafInput}>
             <div className={styles.leafInputLabel}>Генерация?</div>
             <div className={styles.leafInputValue}>
               <Select
-                value={generation}
-                defaultValue={'Учитывать'}
-                onValueChange={(value) => setGeneration(value)}
+                defaultValue={llm_usability}
+                onValueChange={(value) => setLlm_usability(value)}
+                disabled={!onPropertyUpdated}
               >
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue defaultValue={'Учитывать'} />
+                <SelectTrigger className="h-[20px]">
+                  <SelectValue placeholder="Select">{getGenerationValue()}</SelectValue>
                 </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="light">Учитывать</SelectItem>
-                  <SelectItem value="dark">Сделать акцент</SelectItem>
-                  <SelectItem value="system">Не учитывать</SelectItem>
+                <SelectContent className={styles.selectContent}>
+                  <SelectItem className={styles.selectItem} value="must">
+                    Учитывать
+                  </SelectItem>
+                  <SelectItem className={styles.selectItem} value="accent">
+                    Сделать акцент
+                  </SelectItem>
+                  <SelectItem className={styles.selectItem} value="optional">
+                    Не учитывать
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -646,27 +739,32 @@ export const Property = ({
       <div className={styles.leafBlock}>
         <div className={styles.leafTitle}>
           Синонимы
-          <AddButton>
-            <div className={styles.tooltip}>
-              <div className={classNames('grid w-full max-w-sm items-center gap-1.5')}>
-                <Label htmlFor="add">Title</Label>
-                <Input
-                  id="add"
-                  placeholder="Title"
-                  value={newSynonym}
-                  onChange={(e) => setNewSynonym(e.target.value)}
-                />
+          {onPropertyUpdated && (
+            <AddButton>
+              <div className={styles.tooltip}>
+                <div className={classNames('grid w-full max-w-sm items-center gap-1.5')}>
+                  <Label htmlFor="add">Title</Label>
+                  <Input
+                    id="add"
+                    placeholder="Title"
+                    value={newSynonym}
+                    onChange={(e) => setNewSynonym(e.target.value)}
+                    disabled={!onPropertyUpdated}
+                  />
+                </div>
+                <Check className={styles.tooltipCheck} onClick={onSave} />
               </div>
-              <Check className={styles.tooltipCheck} onClick={onSave} />
-            </div>
-          </AddButton>
+            </AddButton>
+          )}
         </div>
         {synonyms?.length ? (
           <div className={styles.synonyms}>
             {synonyms.map((synonym, idx) => (
               <div className={styles.synonym}>
                 {synonym}
-                <Trash className={styles.synonymDelete} onClick={() => deleteSynonym(idx)} />
+                {onPropertyUpdated && (
+                  <Trash className={styles.synonymDelete} onClick={() => deleteSynonym(idx)} />
+                )}
               </div>
             ))}
           </div>

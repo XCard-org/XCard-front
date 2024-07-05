@@ -71,9 +71,11 @@ export const Category = (): JSX.Element => {
     }
   };
 
+  const [newCat, setNewCat] = useState<{ title: string }>();
+
   useEffect(() => {
     axios
-      .get(`${SERVER_ADDRESS}/api/v1/tag/`, {
+      .get(`${SERVER_ADDRESS}/api/v1/tag/${searchParams.get('id')}/link/`, {
         params: {
           root: true,
         },
@@ -81,7 +83,22 @@ export const Category = (): JSX.Element => {
           Authorization: TOKEN(),
         },
       })
-      .then((res) => setRootElements(getElementsFromRequest(res.data)));
+      .then((res) => {
+        setRootElements(getElementsFromRequest(res.data));
+      });
+
+    axios
+      .get(`${SERVER_ADDRESS}/api/v1/tag/${searchParams.get('id')}`, {
+        params: {
+          root: true,
+        },
+        headers: {
+          Authorization: TOKEN(),
+        },
+      })
+      .then((res) => {
+        setNewCat(res.data);
+      });
   }, []);
 
   const onChangeRootSelected = (id: string, selected: boolean): void => {
@@ -120,12 +137,12 @@ export const Category = (): JSX.Element => {
 
   return (
     <div className={styles.category}>
-      <div className={styles.back}>
+      <div className={styles.back} onClick={() => navigate(-1)}>
         <ArrowLeft />
         Назад
       </div>
       <div className={styles.pageWrap}>
-        <div className={styles.title}>Название новой категории</div>
+        <div className={styles.title}>{newCat?.title}</div>
         <div>
           <div className={styles.addTags}>Добавьте теги характеристик</div>
           <div className={stylesCats.categories}>
