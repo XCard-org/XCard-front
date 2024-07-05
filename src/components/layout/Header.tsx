@@ -27,6 +27,13 @@ export const Header = (): JSX.Element => {
     },
   ];
 
+  const bottomMenuItems = [
+    {
+      label: 'Исходные',
+      id: RootPaths.source,
+    },
+  ];
+
   const headerItems = [
     {
       label: 'Сгенерировать',
@@ -67,6 +74,21 @@ export const Header = (): JSX.Element => {
           <div className={styles.sidebarTitle}>База знаний</div>
           <div className={styles.sidebarItems}>
             {menuItems.map((item) => (
+              <div
+                className={classNames(
+                  styles.sidebarItem,
+                  item.id === currentItem && styles.sidebarActiveItem,
+                )}
+                key={item.id}
+                onClick={() => onSelect(item.id)}
+              >
+                {item.label}
+              </div>
+            ))}
+          </div>
+          <div className={styles.sidebarTitle}>Карточки</div>
+          <div className={styles.sidebarItems}>
+            {bottomMenuItems.map((item) => (
               <div
                 className={classNames(
                   styles.sidebarItem,

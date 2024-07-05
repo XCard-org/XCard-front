@@ -73,9 +73,10 @@ export const Category = (): JSX.Element => {
 
   const [newCat, setNewCat] = useState<{ title: string }>();
 
+  const [searchParams] = useSearchParams();
   useEffect(() => {
     axios
-      .get(`${SERVER_ADDRESS}/api/v1/tag/${searchParams.get('id')}/link/`, {
+      .get(`${SERVER_ADDRESS}/api/v1/tag/`, {
         params: {
           root: true,
         },
@@ -99,7 +100,7 @@ export const Category = (): JSX.Element => {
       .then((res) => {
         setNewCat(res.data);
       });
-  }, []);
+  }, [searchParams]);
 
   const onChangeRootSelected = (id: string, selected: boolean): void => {
     setRootSelectedElements((prev) => {
@@ -111,7 +112,6 @@ export const Category = (): JSX.Element => {
     });
   };
 
-  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const onDetailsClicked = (): void => {

@@ -220,7 +220,7 @@ export const MarketPlaces = (): JSX.Element => {
             navigate({
               pathname: RootPaths.category,
               search: createSearchParams({
-                id: selectedElements[selectedElements.length - 1],
+                id: res.data.uid,
               }).toString(),
             });
           }

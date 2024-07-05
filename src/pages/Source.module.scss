@@ -1,0 +1,28 @@
+.table {
+  width: 100%;
+}
+
+.header {
+  padding: 24px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.scrape {
+  background-color: rgba(255, 117, 31, 1);
+  border-radius: 10px;
+  color: white;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.source {
+  width: 100%;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 500;
+}

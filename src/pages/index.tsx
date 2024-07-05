@@ -8,6 +8,8 @@ import { PrivateComponent } from '@/components/PrivateComponent';
 import { SignUp } from '@/pages/SignUp';
 import { Category } from '@/pages/Category';
 import { CategoryDetail } from '@/pages/CategoryDetail';
+import { Source } from '@/pages/Source';
+import { Scrape } from '@/pages/Scrape';
 
 export const RootPaths = {
   root: '/',
@@ -16,6 +18,8 @@ export const RootPaths = {
   marketplaces: '/marketplaces',
   generate: '/generate',
   detail: '/detail',
+  source: '/source',
+  scrape: '/scrape',
   signin: '/signin',
   signup: '/signup',
   error: '*',
@@ -67,6 +71,22 @@ export const router = createBrowserRouter([
         element: (
           <PrivateComponent>
             <CategoryDetail />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.source,
+        element: (
+          <PrivateComponent>
+            <Source />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.scrape,
+        element: (
+          <PrivateComponent>
+            <Scrape />
           </PrivateComponent>
         ),
       },
