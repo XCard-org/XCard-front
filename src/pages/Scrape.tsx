@@ -2,7 +2,7 @@ import { Input } from '@/components/ui/input';
 import styles from './Scrape.module.scss';
 import { useState } from 'react';
 import axios from 'axios';
-import { SERVER_ADDRESS } from '@/constants';
+import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
 
@@ -12,9 +12,17 @@ export const Scrape = (): JSX.Element => {
 
   const onStart = (): void => {
     axios
-      .post(`${SERVER_ADDRESS}/api/v1/card/?queue_scraping=true`, {
-        source_url: link,
-      })
+      .post(
+        `${SERVER_ADDRESS}/api/v1/card/?queue_scraping=true`,
+        {
+          source_url: link,
+        },
+        {
+          headers: {
+            Authorization: TOKEN(),
+          },
+        },
+      )
       .then(() => {
         navigate(RootPaths.source);
       });

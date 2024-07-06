@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import styles from './Source.module.scss';
 import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
+import Image from '../assets/Image.svg?react';
 
 export const Source = (): JSX.Element => {
   const [data, setData] = useState<
@@ -22,6 +23,9 @@ export const Source = (): JSX.Element => {
       manufacturer_url: string;
       price: number;
       currency: string;
+      internal_pim_id: string;
+      source_url: string;
+      images: string[];
     }>
   >([]);
   const navigate = useNavigate();
@@ -34,7 +38,7 @@ export const Source = (): JSX.Element => {
         },
       })
       // @ts-expect-error no err
-      .then((res) => setData(res.data.map((elem) => elem)));
+      .then((res) => setData(res.data.map((elem) => elem.card)));
   }, []);
 
   const onScrape = (): void => {
@@ -52,6 +56,9 @@ export const Source = (): JSX.Element => {
       <Table className={styles.table}>
         <TableHeader>
           <TableRow>
+            <TableHead>
+              <Image />
+            </TableHead>
             <TableHead>Название</TableHead>
             <TableHead>Артикул</TableHead>
             <TableHead>Бренд</TableHead>
@@ -63,9 +70,10 @@ export const Source = (): JSX.Element => {
         <TableBody>
           {data.map((elem) => (
             <TableRow key={elem.uid}>
+              <TableCell>{elem.images?.[0] && <img src={elem.images?.[0]} alt="img" />}</TableCell>
               <TableCell>{elem.title}</TableCell>
-              <TableCell>{elem.manufacturer_id}</TableCell>
-              <TableCell>{elem.manufacturer_url}</TableCell>
+              <TableCell>{elem.internal_pim_id}</TableCell>
+              <TableCell>{elem.source_url}</TableCell>
               <TableCell>{elem.price}</TableCell>
               <TableCell>{elem.currency}</TableCell>
             </TableRow>
