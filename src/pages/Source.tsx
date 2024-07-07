@@ -26,6 +26,7 @@ export const Source = (): JSX.Element => {
       internal_pim_id: string;
       source_url: string;
       images: string[];
+      brand: string;
     }>
   >([]);
   const navigate = useNavigate();
@@ -70,9 +71,14 @@ export const Source = (): JSX.Element => {
         <TableBody>
           {data.map((elem) => (
             <TableRow key={elem.uid}>
-              <TableCell>{elem.images?.[0] && <img src={elem.images?.[0]} alt="img" />}</TableCell>
+              <TableCell>
+                {elem.images?.[0] && (
+                  <img src={elem.images?.[0]} alt="img" className={styles.image} />
+                )}
+              </TableCell>
               <TableCell>{elem.title}</TableCell>
               <TableCell>{elem.internal_pim_id}</TableCell>
+              <TableCell>{elem.brand}</TableCell>
               <TableCell>{elem.source_url}</TableCell>
               <TableCell>{elem.price}</TableCell>
               <TableCell>{elem.currency}</TableCell>
