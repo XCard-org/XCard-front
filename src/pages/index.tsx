@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Categories } from './Categories';
 import { Header } from '@/components/layout/Header';
 import { MarketPlaces } from '@/pages/MarketPlaces';
-import { Generate } from '@/pages/Generage';
+import { Generate } from '@/pages/Generate';
 import { SignIn } from '@/pages/SignIn';
 import { PrivateComponent } from '@/components/PrivateComponent';
 import { SignUp } from '@/pages/SignUp';
@@ -10,6 +10,8 @@ import { Category } from '@/pages/Category';
 import { CategoryDetail } from '@/pages/CategoryDetail';
 import { Source } from '@/pages/Source';
 import { Scrape } from '@/pages/Scrape';
+import { Generated } from '@/pages/Generated';
+import { GenerateWrapper } from '@/pages/GenerateWrapper';
 
 export const RootPaths = {
   root: '/',
@@ -20,6 +22,8 @@ export const RootPaths = {
   detail: '/detail',
   source: '/source',
   scrape: '/scrape',
+  generated: '/generated',
+  generatetables: '/generatetables',
   signin: '/signin',
   signup: '/signup',
   error: '*',
@@ -87,6 +91,22 @@ export const router = createBrowserRouter([
         element: (
           <PrivateComponent>
             <Scrape />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.generated,
+        element: (
+          <PrivateComponent>
+            <Generated />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.generatetables,
+        element: (
+          <PrivateComponent>
+            <GenerateWrapper />
           </PrivateComponent>
         ),
       },

@@ -32,6 +32,10 @@ export const Header = (): JSX.Element => {
       label: 'Исходные',
       id: RootPaths.source,
     },
+    {
+      label: 'Сгенерированные',
+      id: RootPaths.generated,
+    },
   ];
 
   const onSelect = (id: string): void => {

@@ -1,0 +1,127 @@
+.generate {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 36px;
+}
+
+.content {
+  width: 680px;
+}
+
+.title {
+  font-size: 32px;
+  line-height: 48px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.settings {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.name {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 500;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.marketParams {
+  display: flex;
+  gap: 28px;
+}
+
+.marketSelect {
+  width: 320px;
+}
+
+.radioName {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  margin-top: 18px;
+}
+
+.radioText {
+  font-size: 14px;
+  line-height: 20px;
+  color: #71717a;
+}
+
+.radios {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.website {
+  width: 320px;
+}
+
+.start {
+  background-color: rgba(255, 117, 31, 1);
+  border-radius: 10px;
+  color: white;
+  padding: 6px 12px;
+  cursor: pointer;
+  width: fit-content;
+}
+.tooltip {
+  background-color: white;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: flex-end;
+}
+
+.tooltipFields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-grow: 1;
+}
+
+.tooltipCheck {
+  padding: 6px;
+  border: 2px solid black;
+  border-radius: 5px;
+  height: 40px;
+  width: 40px;
+  margin-left: 12px;
+  cursor: pointer;
+}
+
+.trend {
+  display: flex;
+  gap: 12px;
+}
+
+.addTrend {
+  color: #ff751f;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+.trendWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+

@@ -25,7 +25,7 @@ export const AddButton = ({
           <Plus />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80">{children}</PopoverContent>
+      <PopoverContent className={classNames('w-80', styles.tooltipRoot)}>{children}</PopoverContent>
     </Popover>
   );
 };
