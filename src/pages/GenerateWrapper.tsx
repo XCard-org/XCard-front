@@ -2,34 +2,52 @@ import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import styles from './Generate.module.scss';
-import { Radio, Select } from 'antd';
+import { Radio } from 'antd';
+import { CardTable } from '@/containers/CardTableContainer/CardTable';
 import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
+import { createSearchParams } from 'react-router-dom';
+import { Card } from '@/pages/Source';
 
 export const GenerateWrapper = (): JSX.Element => {
-  const [currentPage] = useState();
+  const navigate = useNavigate();
+
+  const [currentPage, setCurrentPage] = useState<string>();
+  const [pageData, setPageData] = useState();
 
   useEffect(() => {
     if (currentPage) {
-      currentPage === 1
+      currentPage === 'source'
         ? axios
             .get(`${SERVER_ADDRESS}/api/v1/card/`, {
               headers: {
                 Authorization: TOKEN(),
               },
             })
-            .then((res) => console.log(res))
+            // @ts-expect-error no err
+            .then((res) => setPageData(res.data.map((elem) => elem.card)))
         : axios
             .get(`${SERVER_ADDRESS}/api/v1/marketplacecard/`, {
               headers: {
                 Authorization: TOKEN(),
               },
             })
-            .then((res) => console.log(res));
+            // @ts-expect-error no err
+            .then((res) => setPageData(res.data.map((elem) => elem.card)));
     }
   }, [currentPage]);
 
-  const navigate = useNavigate();
+  const onCardSelected = (card: Card): void => {
+    if (currentPage) {
+      navigate({
+        pathname: RootPaths.generate,
+        search: createSearchParams({
+          id: card.uid,
+          type: currentPage,
+        }).toString(),
+      });
+    }
+  };
 
   return (
     <div className={styles.generate}>
@@ -40,20 +58,13 @@ export const GenerateWrapper = (): JSX.Element => {
           <div className={styles.marketParams}>
             <div>
               <div className={styles.name}>Что улучшить?</div>
-              <Radio.Group onChange={() => navigate(RootPaths.generate)}>
-                <Radio value={1}>Исходная карточка</Radio>
-                <Radio value={2}>Карточка маркетплейса</Radio>
+              <Radio.Group onChange={(e) => setCurrentPage(e.target.value)}>
+                <Radio value={'source'}>Исходная карточка</Radio>
+                <Radio value={'market'}>Карточка маркетплейса</Radio>
               </Radio.Group>
             </div>
           </div>
-          {currentPage && (
-            <Select
-              className={styles.marketSelect}
-              placeholder="Выберите карточку"
-              options={[]}
-              // onChange={(e) => setSelectedMarket(e)}
-            />
-          )}
+          {pageData && <CardTable data={pageData} onRow={onCardSelected} />}
         </div>
       </div>
     </div>

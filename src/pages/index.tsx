@@ -12,6 +12,7 @@ import { Source } from '@/pages/Source';
 import { Scrape } from '@/pages/Scrape';
 import { Generated } from '@/pages/Generated';
 import { GenerateWrapper } from '@/pages/GenerateWrapper';
+import { Card } from '@/pages/Card';
 
 export const RootPaths = {
   root: '/',
@@ -24,6 +25,7 @@ export const RootPaths = {
   scrape: '/scrape',
   generated: '/generated',
   generatetables: '/generatetables',
+  card: '/card',
   signin: '/signin',
   signup: '/signup',
   error: '*',
@@ -107,6 +109,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateComponent>
             <GenerateWrapper />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.card,
+        element: (
+          <PrivateComponent>
+            <Card />
           </PrivateComponent>
         ),
       },

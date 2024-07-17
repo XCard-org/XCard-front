@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router';
 import styles from './Generated.module.scss';
 import { RootPaths } from '@/pages';
+import { GeneratedTable } from '@/containers/GeneratedContainer/GeneratedTable';
 
 export const Generated = (): JSX.Element => {
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ export const Generated = (): JSX.Element => {
           Сгенерировать
         </div>
       </div>
-      <div></div>
+      <GeneratedTable />
     </div>
   );
 };
