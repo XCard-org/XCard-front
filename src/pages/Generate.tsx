@@ -147,7 +147,7 @@ export const Generate = (): JSX.Element => {
         }/${searchParams.get('id')}/beautify`,
         {
           on_marketplace_id: selectedMarket,
-          trend_id: [trendsValue],
+          trend_id: trendsValue,
           mock: false,
           ignore_feedback: false,
         },
