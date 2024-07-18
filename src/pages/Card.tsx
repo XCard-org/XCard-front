@@ -5,9 +5,13 @@ import { createSearchParams, useNavigate, useSearchParams } from 'react-router-d
 import styles from './Card.module.scss';
 import { type Card as CardType } from '@/pages/Source';
 import Slash from '../assets/Slash.svg?react';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Pencil } from 'lucide-react';
 import classNames from 'classnames';
 import { RootPaths } from '@/pages';
+import Star from '../assets/Star.svg?react';
+import ActiveStar from '../assets/ActiveStar.svg?react';
+import { Checkbox, Input } from 'antd';
+import TextArea from 'antd/es/input/TextArea';
 
 const getImageSelection = (selected: number, amount: number): [number, number] => {
   if (amount < 4) {
@@ -122,6 +126,93 @@ export const Card = (): JSX.Element => {
             </div>
           ))}
         </div>
+      </div>
+      <div className={styles.grade}>
+        <div className={styles.gradeTitle}>Ручная оценка</div>
+        <div className={styles.grades}>
+          <HandleGrade />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const HandleGrade = (): JSX.Element => {
+  const [grade, setGrade] = useState(3);
+
+  const activeStars = [];
+  const passiveStars = [];
+
+  for (let i = 0; i < grade; i += 1) {
+    activeStars.push(
+      <div
+        className={classNames(styles.star, styles.activeStar, styles.starWrap)}
+        onClick={() => setGrade(grade - i)}
+      >
+        <ActiveStar />
+      </div>,
+    );
+  }
+
+  for (let i = grade; i < 5; i += 1) {
+    passiveStars.push(
+      <div
+        className={classNames(styles.star, styles.passiveStar, styles.starWrap)}
+        onClick={() => setGrade(5 - i + grade)}
+      >
+        <Star />
+      </div>,
+    );
+  }
+
+  return (
+    <div className={styles.singleGrade}>
+      <div className={styles.gradeTop}>
+        <div className={styles.gradeHeader}>
+          <div className={styles.gradeAuthor}>
+            <img
+              src={
+                'https://gravatar.com/avatar/59843dc40f88c947986f9c34072936d9?s=400&d=robohash&r=x'
+              }
+              alt="avatar"
+              className={styles.gradeImg}
+            />
+            <div className={styles.gradePerson}>
+              <div className={styles.gradeRole}>Аннотатор</div>
+              <div className={styles.gradeName}>Андрей Давыдов</div>
+            </div>
+          </div>
+          <div className={styles.gradeDate}>2 дня назад</div>
+          <Pencil className={styles.gradeEdit} />
+        </div>
+        <div className={styles.gradeStars}>
+          <div className={styles.stars}>
+            {passiveStars.map((elem) => elem)}
+            {activeStars.map((elem) => elem)}
+          </div>
+          <div className={styles.gradeValue}>{grade}/5</div>
+          <div className={styles.gradeInclude}>Включить в регенерацию</div>
+        </div>
+      </div>
+      <div className={styles.gradeBlock}>
+        <div className={styles.gradeProp}>По частям</div>
+        <div className={styles.gradeCheckboxes}>
+          <Checkbox className={styles.gradeCheckbox}>Полностью не туда</Checkbox>
+          <Checkbox className={styles.gradeCheckbox}>Заголовок</Checkbox>
+          <Checkbox className={styles.gradeCheckbox}>Описание</Checkbox>
+        </div>
+      </div>
+      <div className={styles.gradeBlock}>
+        <div className={styles.gradeProp}>Текст</div>
+        <div className={styles.gradeCheckboxes}>
+          <Checkbox className={styles.gradeCheckbox}>Грамматика</Checkbox>
+          <Checkbox className={styles.gradeCheckbox}>Семантика</Checkbox>
+        </div>
+      </div>
+      <div>
+        <div className={styles.gradeProp}>Исправления</div>
+        <Input placeholder="Заголовок" className={styles.input} />
+        <TextArea placeholder="Описание" className={styles.input} />
       </div>
     </div>
   );

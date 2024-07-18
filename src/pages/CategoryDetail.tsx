@@ -64,6 +64,23 @@ export const CategoryDetail = (): JSX.Element => {
     navigate(RootPaths.marketplaces);
   };
 
+  const onPropertyUpdated = (
+    key: string,
+    tagId: string,
+    id: string,
+    body: Record<string, string | Array<string> | boolean | number>,
+  ): void => {
+    axios.put(
+      `${SERVER_ADDRESS}/api/v1/tag/${tagId}/property/${id}`,
+      { ...body, key: body.key || key },
+      {
+        headers: {
+          Authorization: TOKEN(),
+        },
+      },
+    );
+  };
+
   return (
     <div className={stylesCat.category}>
       <div className={styles.header}>
@@ -86,7 +103,12 @@ export const CategoryDetail = (): JSX.Element => {
           </div>
 
           <div className={styles.leaf}>
-            <LeafCategory direction={direction} />
+            <LeafCategory
+              direction={direction}
+              onPropertyUpdated={(id, body) =>
+                onPropertyUpdated(newCat?.title as string, searchParams.get('id') || '', id, body)
+              }
+            />
           </div>
         </div>
       </div>

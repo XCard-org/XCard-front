@@ -161,3 +161,175 @@
   opacity: 0.4;
 }
 
+.grade {
+  margin-top: 20px;
+}
+
+.gradeTitle {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.grades {
+  display: flex;
+  gap: 20px 20px;
+}
+
+.singleGrade {
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid #eee;
+}
+
+.gradeTop {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
+.gradeHeader {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.gradeAuthor {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+}
+
+.gradeImg {
+  height: 40px;
+  width: 40px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+}
+
+.gradeRole {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.gradeName {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.gradeDate {
+  align-self: flex-end;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 14px;
+}
+
+.gradeEdit {
+  align-self: center;
+  margin-left: auto;
+  height: 18px;
+  cursor: pointer;
+  opacity: 0.6;
+}
+
+.stars {
+  display: flex;
+  direction: rtl;
+}
+
+.starWrap {
+  padding: 0 4px;
+}
+
+.star {
+  cursor: pointer;
+}
+
+.activeStar {
+  color: #ff751f;
+}
+
+.passiveStar {
+  color: rgba(0, 0, 0, 0.24);
+
+  &:hover {
+    color: #ff751f;
+
+    & ~ .passiveStar {
+      color: #ff751f;
+    }
+  }
+}
+
+.gradeStars {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.gradeValue {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.gradeInclude {
+  font-size: 14px;
+  line-height: 24px;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background-color: rgba(255, 117, 31, 0.12);
+  color: #ff751f;
+  cursor: pointer;
+}
+
+.gradeCheckboxes {
+  display: flex;
+  gap: 20px;
+}
+
+.gradeCheckbox {
+  display: flex;
+  gap: 6px;
+  font-weight: 500;
+}
+
+.gradeProp {
+  font-size: 16px;
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.gradeBlock {
+  padding-bottom: 16px;
+
+  &:not(:last-child) {
+    border-bottom: 1px solid #eee;
+  }
+}
+
+.leafInput {
+  position: relative;
+  border: 1px solid rgba(203, 213, 225, 0.4);
+  border-radius: 6px;
+  flex-grow: 1;
+  max-height: 42px;
+  min-width: 90px;
+}
+
+.leafInputLabel {
+  color: #93939f;
+  font-size: 11px;
+  position: absolute;
+  margin-left: 12px;
+  top: 2px;
+}
+
+.input {
+  &:not(:last-child) {
+    margin-bottom: 12px;
+  }
+}
+
