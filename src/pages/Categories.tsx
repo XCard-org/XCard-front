@@ -386,11 +386,12 @@ export const LeafCategory = ({
         {direction?.elements?.map((elem) => (
           <Property
             elem={elem}
-            onDelete={() => onDelete?.(elem.id)}
+            onDelete={onDelete ? () => onDelete(elem.id) : undefined}
             onPropertyUpdated={
               onPropertyUpdated ? (body) => onPropertyUpdated?.(elem.id, body) : undefined
             }
             onPropertySelected={onPropertySelected}
+            key={elem.id}
           />
         ))}
       </div>
@@ -405,7 +406,7 @@ export const Property = ({
   onPropertySelected,
 }: {
   elem: Direction;
-  onDelete: () => void;
+  onDelete?: () => void;
   onPropertyUpdated?: (body: Record<string, string | Array<string> | boolean | number>) => void;
   onPropertySelected?: (id: string) => void;
 }): JSX.Element => {
@@ -603,7 +604,7 @@ export const Property = ({
       )}
       onClick={selectElem}
     >
-      {onPropertyUpdated && (
+      {onDelete && (
         <Trash
           className={styles.trashLeaf}
           onClick={(e) => {
@@ -736,7 +737,7 @@ export const Property = ({
           </div>
         </div>
       </div>
-      <div className={styles.leafBlock}>
+      <div className={classNames(styles.leafBlock, styles.blockGrow)}>
         <div className={styles.leafTitle}>
           Синонимы
           {onPropertyUpdated && (

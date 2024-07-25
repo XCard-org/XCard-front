@@ -144,6 +144,11 @@
   gap: 12px;
 }
 
+.blockGrow {
+  flex-grow: 1;
+  margin-top: -4px;
+}
+
 .input {
   border: none;
   padding-bottom: 0 !important;
@@ -171,12 +176,12 @@
 .synonyms {
   border: 1px solid rgba(203, 213, 225, 0.4);
   border-radius: 6px;
-  width: 200px;
+  width: 100%;
 }
 
 .synonym {
   border-bottom: 1px solid rgba(203, 213, 225, 0.4);
-  padding: 10px 12px;
+  padding: 9.2px 12px;
   font-size: 14px;
   display: flex;
   align-items: center;

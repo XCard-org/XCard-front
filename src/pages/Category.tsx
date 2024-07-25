@@ -6,9 +6,10 @@ import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { useEffect, useState } from 'react';
 import { Direction } from '@/pages/Categories';
 import classNames from 'classnames';
-import { ArrowLeft, Check, Trash } from 'lucide-react';
+import { Check, Trash } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RootPaths } from '@/pages';
+import { BackButton } from '@/components/BackButton';
 
 export const Category = (): JSX.Element => {
   const [directions, setDirections] = useState<Direction[]>([]);
@@ -137,10 +138,7 @@ export const Category = (): JSX.Element => {
 
   return (
     <div className={styles.category}>
-      <div className={styles.back} onClick={() => navigate(-1)}>
-        <ArrowLeft />
-        Назад
-      </div>
+      <BackButton />
       <div className={styles.pageWrap}>
         <div className={styles.title}>{newCat?.title}</div>
         <div>

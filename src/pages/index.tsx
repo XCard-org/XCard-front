@@ -26,6 +26,7 @@ export const RootPaths = {
   generated: '/generated',
   generatetables: '/generatetables',
   card: '/card',
+  marketcard: '/marketcard',
   signin: '/signin',
   signup: '/signup',
   error: '*',
@@ -117,6 +118,14 @@ export const router = createBrowserRouter([
         element: (
           <PrivateComponent>
             <Card />
+          </PrivateComponent>
+        ),
+      },
+      {
+        path: RootPaths.marketcard,
+        element: (
+          <PrivateComponent>
+            <Card isMarket={true} />
           </PrivateComponent>
         ),
       },

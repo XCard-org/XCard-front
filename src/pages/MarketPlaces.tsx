@@ -18,9 +18,27 @@ import { createSearchParams } from 'react-router-dom';
 
 export const MarketPlaces = (): JSX.Element => {
   const navigate = useNavigate();
-  const [directions, setDirections] = useState<Direction[]>([]);
-  const [rootElements, setRootElements] = useState<Direction[]>([]);
-  const [selectedElements, setSelectedElements] = useState<string[]>([]);
+  const [directions, setDirections] = useState<Direction[]>(
+    JSON.parse(localStorage.getItem('directions') || '[]'),
+  );
+  const [rootElements, setRootElements] = useState<Direction[]>(
+    JSON.parse(localStorage.getItem('rootElements') || '[]'),
+  );
+  const [selectedElements, setSelectedElements] = useState<string[]>(
+    JSON.parse(localStorage.getItem('selectedElements') || '[]'),
+  );
+
+  useEffect(() => {
+    localStorage.setItem('directions', JSON.stringify(directions));
+  }, [directions]);
+
+  useEffect(() => {
+    localStorage.setItem('rootElements', JSON.stringify(rootElements));
+  }, [rootElements]);
+
+  useEffect(() => {
+    localStorage.setItem('selectedElements', JSON.stringify(selectedElements));
+  }, [selectedElements]);
 
   const getElementsFromRequest = (data: any): Direction[] => {
     return data.map((elem: any) => ({
@@ -34,7 +52,8 @@ export const MarketPlaces = (): JSX.Element => {
     setSelectedElements((prev) => {
       const newValue = [...prev];
       newValue[nestValue] = direction.id;
-      return newValue;
+
+      return newValue.splice(0, nestValue + 1);
     });
   };
 
@@ -159,7 +178,10 @@ export const MarketPlaces = (): JSX.Element => {
           },
         )
         .then((res) => {
-          setRootElements((prev) => [...prev, { label: res.data.name, id: res.data.uid }]);
+          const direction = { label: res.data.name, id: res.data.uid };
+          setRootElements((prev) => [...prev, direction]);
+          onSelectDirection(direction, 0);
+          onElementSelected(direction, 0);
         });
     } else if (parent === '0') {
       axios

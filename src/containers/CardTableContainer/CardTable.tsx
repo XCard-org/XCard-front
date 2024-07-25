@@ -12,24 +12,49 @@ import { Card } from '@/pages/Source';
 import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
 import { createSearchParams } from 'react-router-dom';
+import { useCallback, useEffect } from 'react';
 
 export const CardTable = ({
   data,
   onRow,
+  loadMore,
+  stopLoad,
+  isMarket,
 }: {
   data: Card[];
   onRow?: (card: Card) => void;
+  loadMore: () => void;
+  stopLoad: boolean;
+  isMarket?: boolean;
 }): JSX.Element => {
   const navigate = useNavigate();
 
   const openCard = (elem: Card): void => {
     navigate({
-      pathname: RootPaths.card,
+      pathname: isMarket ? RootPaths.marketcard : RootPaths.card,
       search: createSearchParams({
         id: elem.uid,
       }).toString(),
     });
   };
+
+  const handleScroll = useCallback(() => {
+    if (!stopLoad) {
+      const tableElement = document.querySelector(`.${styles.table}`);
+      if (tableElement) {
+        const bottom = tableElement.getBoundingClientRect().bottom <= window.innerHeight;
+        if (bottom) {
+          loadMore();
+        }
+      }
+    }
+  }, [loadMore, stopLoad]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll, stopLoad]);
 
   return (
     <Table className={styles.table}>
@@ -50,8 +75,8 @@ export const CardTable = ({
         {data.map((elem) => (
           <TableRow key={elem.uid} onClick={() => (onRow ? onRow?.(elem) : openCard(elem))}>
             <TableCell>
-              {elem.images?.[0] && (
-                <img src={elem.images?.[0]} alt="img" className={styles.image} />
+              {elem?.images?.[0] && (
+                <img src={elem?.images?.[0]} alt="img" className={styles.image} />
               )}
             </TableCell>
             <TableCell>{elem.title}</TableCell>

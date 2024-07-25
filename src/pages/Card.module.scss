@@ -145,18 +145,6 @@
   line-height: 28px;
 }
 
-.back {
-  color: #64748b;
-  font-size: 20px;
-  line-height: 32px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 18px;
-  cursor: pointer;
-}
-
 .imagePreviewSelected {
   opacity: 0.4;
 }
@@ -170,17 +158,32 @@
   line-height: 32px;
   font-weight: 600;
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
 }
 
 .grades {
   display: flex;
   gap: 20px 20px;
+  flex-wrap: wrap;
 }
 
 .singleGrade {
   padding: 20px;
   border-radius: 20px;
   border: 1px solid #eee;
+
+  :global {
+    .ant-form-item {
+      margin-bottom: 0;
+      min-height: unset;
+    }
+
+    .ant-form-item-control-input {
+      min-height: unset;
+    }
+  }
 }
 
 .gradeTop {
@@ -213,6 +216,11 @@
   font-weight: 500;
 }
 
+.bottomBlock {
+  padding-bottom: 16px;
+  border-bottom: 1px solid #eee;
+}
+
 .gradeName {
   font-size: 14px;
   font-weight: 500;
@@ -227,9 +235,16 @@
 .gradeEdit {
   align-self: center;
   margin-left: auto;
-  height: 18px;
   cursor: pointer;
   opacity: 0.6;
+  border-radius: 4px;
+  padding: 4px 2px;
+  transition: background-color 0.15s ease;
+}
+
+.gradeEditing {
+  background-color: #eee;
+  transition: background-color 0.15s ease;
 }
 
 .stars {
@@ -251,7 +266,9 @@
 
 .passiveStar {
   color: rgba(0, 0, 0, 0.24);
+}
 
+.starEditing {
   &:hover {
     color: #ff751f;
 
@@ -280,7 +297,6 @@
   border-radius: 6px;
   background-color: rgba(255, 117, 31, 0.12);
   color: #ff751f;
-  cursor: pointer;
 }
 
 .gradeCheckboxes {
@@ -328,8 +344,6 @@
 }
 
 .input {
-  &:not(:last-child) {
-    margin-bottom: 12px;
-  }
+  margin-bottom: 12px;
 }
 

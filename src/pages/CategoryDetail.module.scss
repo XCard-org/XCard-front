@@ -16,6 +16,13 @@
   &:last-child {
     border-bottom: none;
   }
+
+  &:hover {
+    .unlink {
+      opacity: 1;
+      transition: opacity 0.15s ease;
+    }
+  }
 }
 
 .content {
@@ -37,3 +44,9 @@
   align-items: center;
 }
 
+.unlink {
+  height: 16px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}

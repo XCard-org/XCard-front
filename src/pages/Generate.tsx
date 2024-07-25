@@ -1,4 +1,4 @@
-import { Input, Select } from 'antd';
+import { Collapse, Input, Select } from 'antd';
 import styles from './Generate.module.scss';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
@@ -9,6 +9,8 @@ import { Label } from '@/components/ui/label';
 import { Check } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RootPaths } from '@/pages';
+import { BackButton } from '@/components/BackButton';
+import { CardItem } from '@/pages/Card';
 
 type Option = {
   label: string;
@@ -21,8 +23,9 @@ export const Generate = (): JSX.Element => {
   const [selectedMarket, setSelectedMarket] = useState();
   /* const [treeData, setTreeData] = useState<Omit<DefaultOptionType, 'label'>[]>([]);
   const [value, setValue] = useState<string>();*/
-  const [trends, setTrends] = useState([]);
+  const [trends, setTrends] = useState<Array<{ value: string; label: string; level: number }>>([]);
   const [searchParams] = useSearchParams();
+  const [card, setCard] = useState<CardItem>();
 
   useEffect(() => {
     axios
@@ -44,6 +47,21 @@ export const Generate = (): JSX.Element => {
       );
 
     axios
+      .get(
+        `${SERVER_ADDRESS}/api/v1/${
+          searchParams.get('type') === 'market' ? 'marketplace' : ''
+        }card/${searchParams.get('id')}`,
+        {
+          headers: {
+            Authorization: TOKEN(),
+          },
+        },
+      )
+      .then((res) => {
+        setCard({ ...res.data });
+      });
+
+    axios
       .get(`${SERVER_ADDRESS}/api/v1/trend/`, {
         headers: {
           Authorization: TOKEN(),
@@ -58,7 +76,7 @@ export const Generate = (): JSX.Element => {
           })),
         );
       });
-  }, []);
+  }, [searchParams]);
 
   const [newTrend, setNewTrend] = useState('');
 
@@ -77,22 +95,22 @@ export const Generate = (): JSX.Element => {
           },
         },
       )
-      .then((res) =>
-        // @ts-expect-error npo err
-        setTrends((prev) => [
-          {
-            label: res.data.title,
-            value: res.data.uid,
-            level: res.data.strength,
-          },
-          ...prev,
-        ]),
-      );
+      .then((res) => {
+        const newItem = {
+          label: res.data.title,
+          value: res.data.uid,
+          level: res.data.strength,
+        };
+        setTrends((prev) => [newItem, ...prev]);
+        setTrendsValue((prev) => [...prev, newItem]);
+      });
     setNewTrend('');
     setLevel(undefined);
   };
 
-  const [trendsValue, setTrendsValue] = useState<string[]>([]);
+  const [trendsValue, setTrendsValue] = useState<
+    Array<{ value?: string; label?: string; level?: number }>
+  >([]);
   const [level, setLevel] = useState<1 | 2 | 3 | 4 | 5 | undefined>(undefined);
 
   const onLevelChange = (id: string, strength: number, title: string): void => {
@@ -111,13 +129,10 @@ export const Generate = (): JSX.Element => {
         },
       )
       .then(() => {
-        // @ts-expect-error no err
         setTrends((prev) =>
           prev.map((elem) => {
-            // @ts-expect-error no err
             if (elem.value === id) {
               return {
-                // @ts-expect-error no err
                 ...elem,
                 level: strength,
               };
@@ -129,10 +144,13 @@ export const Generate = (): JSX.Element => {
       });
   };
 
-  const onTrendSelected = (idx: number, value: string): void => {
+  const onTrendSelected = (
+    idx: number,
+    elem: { value?: string; label?: string; level?: number },
+  ): void => {
     setTrendsValue((prev) => {
       const newValue = [...prev];
-      newValue[idx] = value;
+      newValue[idx] = elem;
       return newValue;
     });
   };
@@ -147,7 +165,7 @@ export const Generate = (): JSX.Element => {
         }/${searchParams.get('id')}/beautify`,
         {
           on_marketplace_id: selectedMarket,
-          trend_id: trendsValue,
+          trend_id: trendsValue.map((elem) => elem.value),
           mock: false,
           ignore_feedback: false,
         },
@@ -162,10 +180,36 @@ export const Generate = (): JSX.Element => {
 
   return (
     <div className={styles.generate}>
+      <div className={styles.back}>
+        <BackButton />
+      </div>
       <div className={styles.content}>
         <div className={styles.title}>Генерация карточки товара</div>
         <div className={styles.settings}>
           <h3 className={styles.params}>Параметры</h3>
+          <div>
+            <Collapse
+              ghost
+              expandIconPosition="end"
+              items={[
+                {
+                  key: '1',
+                  label: <div className={styles.name}>Характеристики</div>,
+                  children: (
+                    <div className={styles.chars}>
+                      {card?.property?.map((elem) => (
+                        <div className={styles.char} key={elem?.key}>
+                          <div className={styles.charName}>{elem.key}</div>
+                          <div className={styles.dots} />
+                          <div className={styles.charValue}>{elem.value}</div>
+                        </div>
+                      ))}
+                    </div>
+                  ),
+                },
+              ]}
+            />
+          </div>
           <div className={styles.marketParams}>
             <div>
               <div className={styles.name}>Маркетплейс</div>
@@ -208,18 +252,26 @@ export const Generate = (): JSX.Element => {
               </AddButton>
             </div>
             <div className={styles.trendWrapper}>
-              {trendsValue.map((_, id) => (
+              {trendsValue.map((elem, idx) => (
                 <TrendOption
-                  key={id}
+                  key={idx}
                   trends={trends}
                   onLevelChange={onLevelChange}
-                  onTrendSelected={(value: string) => onTrendSelected(id, value)}
+                  onTrendSelected={(value: { value?: string; label?: string; level?: number }) =>
+                    onTrendSelected(idx, value)
+                  }
+                  value={elem}
                 />
               ))}
             </div>
             <div
               className={styles.addTrend}
-              onClick={() => setTrendsValue((prev) => [...prev, ''])}
+              onClick={() =>
+                setTrendsValue((prev) => [
+                  ...prev,
+                  { value: undefined, level: undefined, label: undefined },
+                ])
+              }
             >
               Добавить тренд
             </div>
@@ -242,26 +294,25 @@ const TrendOption = ({
   trends,
   onLevelChange,
   onTrendSelected,
+  value,
 }: {
   trends: Option[];
   onLevelChange: (id: string, strength: number, title: string) => void;
-  onTrendSelected: (value: string) => void;
+  onTrendSelected: (value: { value?: string; label?: string; level?: number }) => void;
+  defaultLevel?: number;
+  defaultTrend?: string;
+  value: { value?: string; label?: string; level?: number };
 }): JSX.Element => {
-  const [level, setLevel] = useState<number | undefined>(undefined);
-  const [trend, setTrend] = useState<string | undefined>(undefined);
-
   const onTrend = (e: string): void => {
-    setTrend(e);
     const elem = trends.find((elem) => elem.value === e);
-    setLevel(elem?.level);
-    onTrendSelected(e);
+    onTrendSelected({ value: e, label: elem?.label, level: elem?.level });
   };
 
   const handleLevel = (e: number): void => {
-    const elem = trends.find((elem) => elem.value === trend);
+    const elem = trends.find((elem) => elem.value === value.value);
 
-    setLevel(e);
-    onLevelChange(trend as string, e, elem?.label as string);
+    onLevelChange(elem?.value as string, e, elem?.label as string);
+    onTrendSelected({ value: elem?.value, label: elem?.label, level: e });
   };
 
   return (
@@ -271,15 +322,15 @@ const TrendOption = ({
         placeholder="Выберите слово"
         options={trends}
         onChange={(e) => onTrend(e)}
-        value={trend}
+        value={value.value}
       />
       <Select
         className={styles.marketSelect}
         placeholder="Выберите уровень"
         options={levelOptions}
         onChange={(e) => handleLevel(e)}
-        value={level}
-        disabled={!trend}
+        value={value.level}
+        disabled={!value.value}
       />
     </div>
   );
