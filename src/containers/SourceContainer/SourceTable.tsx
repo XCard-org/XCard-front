@@ -20,7 +20,6 @@ export const SourceTable = ({
   const loadMore = useCallback(async () => {
     if (loading) return;
     setLoading(true);
-    console.log(stopLoad, skip, data);
     try {
       if (!stopLoad && skip === data.length) {
         const res = await axios.get(`${SERVER_ADDRESS}/api/v1/card/`, {

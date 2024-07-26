@@ -20,7 +20,7 @@ export type Card = {
   images: string[];
   brand: string;
   description: string;
-  createdAt?: string;
+  created_at?: string;
 };
 
 export const Source = (): JSX.Element => {

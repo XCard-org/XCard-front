@@ -104,7 +104,9 @@ export const CardTable = ({
             <TableCell>{elem.card?.currency}</TableCell>
             <TableCell className={styles.cellUid}>{elem.card?.uid?.slice(-4)}</TableCell>
             <TableCell>
-              {elem.card?.createdAt ? dayjs(elem.card?.createdAt).format('HH:mm DD.MM.YYYY') : null}
+              {elem.card?.created_at
+                ? dayjs(elem.card?.created_at).format('HH:mm DD.MM.YYYY')
+                : null}
             </TableCell>
           </TableRow>
         ))}
