@@ -80,11 +80,13 @@ export const Scrape = (): JSX.Element => {
         `${SERVER_ADDRESS}/api/v1/card/?queue_scraping=true`,
         {
           source_url: link,
-          category_id: value,
         },
         {
           headers: {
             Authorization: TOKEN(),
+          },
+          params: {
+            category_id: value,
           },
         },
       )

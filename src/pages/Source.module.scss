@@ -19,7 +19,21 @@
 }
 
 .title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.titleValue {
   font-size: 24px;
   font-weight: 500;
+}
+
+.selectCat {
+  min-width: 120px;
+}
+
+.selectTag {
+  min-width: 188px;
 }
 

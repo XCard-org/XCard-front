@@ -1,10 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import axios from 'axios';
 import { useEffect, useState, useCallback } from 'react';
 import { CardTable } from '@/containers/CardTableContainer/CardTable';
 import { CardItem } from '@/pages/Card';
 
-export const SourceTable = (): JSX.Element => {
+export const SourceTable = ({
+  tags,
+  categories,
+}: {
+  tags: string[];
+  categories: string[];
+}): JSX.Element => {
   const [data, setData] = useState<CardItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [skip, setSkip] = useState<number>(0);
@@ -13,12 +20,15 @@ export const SourceTable = (): JSX.Element => {
   const loadMore = useCallback(async () => {
     if (loading) return;
     setLoading(true);
+    console.log(stopLoad, skip, data);
     try {
       if (!stopLoad && skip === data.length) {
         const res = await axios.get(`${SERVER_ADDRESS}/api/v1/card/`, {
           params: {
             skip,
             limit: skip + 50,
+            category_id: categories,
+            additional_tag_id: tags,
           },
           headers: {
             Authorization: TOKEN(),
@@ -44,8 +54,16 @@ export const SourceTable = (): JSX.Element => {
   }, [loading, stopLoad, skip, data]);
 
   useEffect(() => {
-    loadMore();
-  }, [loadMore]);
+    setData([]);
+    setStopLoad(false);
+    setSkip(0);
+  }, [categories, tags]);
+
+  useEffect(() => {
+    if (!data?.length) {
+      loadMore();
+    }
+  }, [data]);
 
   return <CardTable data={data} loadMore={loadMore} stopLoad={stopLoad} />;
 };

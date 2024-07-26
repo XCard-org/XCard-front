@@ -59,10 +59,11 @@ type Category = {
 export type CardItem = {
   card?: CardType;
   marketplace_card?: CardType;
-  property: Array<{ key: string; value: string }>;
+  property: Array<{ key: string; value: string; uid: string }>;
   category?: Category;
   human_feedback?: Feedback[];
   categories?: Category[];
+  additional_tags?: Category[];
   beautification?: {
     uid: string;
   };
@@ -232,7 +233,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
           <div className={styles.charsTitle}>Характеристики</div>
           <div className={styles.chars}>
             {card?.property?.map((elem) => (
-              <div className={styles.char} key={elem?.key}>
+              <div className={styles.char} key={elem?.uid}>
                 <div className={styles.charName}>{elem.key}</div>
                 <div className={styles.dots} />
                 <div className={styles.charValue}>{elem.value}</div>

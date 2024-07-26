@@ -1,10 +1,19 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import axios from 'axios';
 import { useEffect, useState, useCallback } from 'react';
 import { CardTable } from '@/containers/CardTableContainer/CardTable';
 import { CardItem } from '@/pages/Card';
 
-export const GeneratedTable = (): JSX.Element => {
+export const GeneratedTable = ({
+  marketplaces,
+  categories,
+  tags,
+}: {
+  marketplaces: string[];
+  categories: string[];
+  tags: string[];
+}): JSX.Element => {
   const [data, setData] = useState<CardItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [skip, setSkip] = useState<number>(0);
@@ -44,8 +53,16 @@ export const GeneratedTable = (): JSX.Element => {
   }, [loading, stopLoad, skip, data]);
 
   useEffect(() => {
-    loadMore();
-  }, [loadMore]);
+    setData([]);
+    setStopLoad(false);
+    setSkip(0);
+  }, [categories, tags, marketplaces]);
+
+  useEffect(() => {
+    if (!data?.length) {
+      loadMore();
+    }
+  }, [data]);
 
   return <CardTable data={data} loadMore={loadMore} stopLoad={stopLoad} isMarket={true} />;
 };

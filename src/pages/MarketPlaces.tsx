@@ -167,6 +167,7 @@ export const MarketPlaces = (): JSX.Element => {
             name: title,
             url: 'https://www.ozon.ru/',
             icon_url: '',
+            is_main_kb: true,
           },
           {
             params: {

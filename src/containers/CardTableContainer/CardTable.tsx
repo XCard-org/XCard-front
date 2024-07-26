@@ -14,6 +14,7 @@ import { RootPaths } from '@/pages';
 import { createSearchParams } from 'react-router-dom';
 import { useCallback, useEffect } from 'react';
 import { CardItem } from '@/pages/Card';
+import dayjs from 'dayjs';
 
 export const CardTable = ({
   data,
@@ -29,7 +30,6 @@ export const CardTable = ({
   isMarket?: boolean;
 }): JSX.Element => {
   const navigate = useNavigate();
-  console.log(data);
 
   const openCard = (elem: Card): void => {
     navigate({
@@ -67,12 +67,14 @@ export const CardTable = ({
           </TableHead>
           <TableHead>Название</TableHead>
           <TableHead>Категория</TableHead>
+          <TableHead>Доп. тег</TableHead>
           <TableHead>Артикул</TableHead>
           <TableHead>Бренд</TableHead>
           <TableHead>Ссылка</TableHead>
           <TableHead>Цена</TableHead>
           <TableHead>Валюта</TableHead>
           <TableHead>UID</TableHead>
+          <TableHead>Создано</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -88,12 +90,22 @@ export const CardTable = ({
             </TableCell>
             <TableCell>{elem.card?.title}</TableCell>
             <TableCell>{elem?.category?.title}</TableCell>
+            <TableCell>
+              <div>
+                {elem?.additional_tags?.map((elem) => (
+                  <div>{elem?.title}</div>
+                ))}
+              </div>
+            </TableCell>
             <TableCell>{elem.card?.internal_pim_id}</TableCell>
             <TableCell>{elem.card?.brand}</TableCell>
             <TableCell>{elem.card?.source_url}</TableCell>
             <TableCell>{elem.card?.price}</TableCell>
             <TableCell>{elem.card?.currency}</TableCell>
             <TableCell className={styles.cellUid}>{elem.card?.uid?.slice(-4)}</TableCell>
+            <TableCell>
+              {elem.card?.createdAt ? dayjs(elem.card?.createdAt).format('HH:mm DD.MM.YYYY') : null}
+            </TableCell>
           </TableRow>
         ))}
       </TableBody>
