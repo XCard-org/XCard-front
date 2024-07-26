@@ -5,7 +5,7 @@ import { createSearchParams, useNavigate, useSearchParams } from 'react-router-d
 import styles from './Card.module.scss';
 import { type Card as CardType } from '@/pages/Source';
 import Slash from '../assets/Slash.svg?react';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash } from 'lucide-react';
 import classNames from 'classnames';
 import { RootPaths } from '@/pages';
 import Star from '../assets/Star.svg?react';
@@ -48,6 +48,7 @@ type Feedback = {
     avatar?: string;
     full_name: string;
   };
+  defaultEditing?: boolean;
 };
 
 type Category = {
@@ -121,7 +122,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
       pathname: RootPaths.generate,
       search: createSearchParams({
         id: searchParams.get('id') || '',
-        type: 'source',
+        type: isMarket ? 'market' : 'source',
       }).toString(),
     });
   };
@@ -146,11 +147,23 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
         // @ts-expect-error correct
         setCard((prev) => ({
           ...prev,
-          // @ts-expect-error no error
           // eslint-disable-next-line no-unsafe-optional-chaining
-          human_feedback: [res.data, ...prev?.human_feedback],
+          human_feedback: [{ ...res.data, defaultEditing: true }, ...(prev?.human_feedback || [])],
         }));
       });
+  };
+
+  const deleteGrade = (id: string): void => {
+    // @ts-expect-error correct
+    setCard((prev) => ({
+      ...prev,
+      ...prev?.human_feedback?.filter((elem) => elem?.human_feedback?.uid === id),
+    }));
+    axios.delete(`${SERVER_ADDRESS}/api/v1/beauty/${card?.beautification?.uid}/feedback/${id}`, {
+      headers: {
+        Authorization: TOKEN(),
+      },
+    });
   };
 
   return (
@@ -206,10 +219,10 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
             <div className={styles.blockTitle}>Описание</div>
             <div className={styles.description}>{card?.[cardPrefix]?.description}</div>
           </div>
-          {card?.[cardPrefix]?.manufacturer_url && (
+          {card?.[cardPrefix]?.source_url && (
             <div className={styles.textBlock}>
               <div className={styles.blockTitle}>Ссылка</div>
-              <div className={styles.link}>{card?.[cardPrefix]?.manufacturer_url}</div>
+              <div className={styles.link}>{card?.[cardPrefix]?.source_url}</div>
             </div>
           )}
         </div>
@@ -240,6 +253,8 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
                 info={elem}
                 beautyUid={card?.beautification?.uid as string}
                 key={elem?.human_feedback?.uid}
+                deleteGrade={() => deleteGrade(elem?.human_feedback?.uid)}
+                defaultEditing={elem?.defaultEditing as boolean}
               />
             ))}
           </div>
@@ -249,10 +264,20 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
   );
 };
 
-const HandleGrade = ({ info, beautyUid }: { info: Feedback; beautyUid: string }): JSX.Element => {
+const HandleGrade = ({
+  info,
+  beautyUid,
+  deleteGrade,
+  defaultEditing,
+}: {
+  info: Feedback;
+  beautyUid: string;
+  deleteGrade: () => void;
+  defaultEditing: boolean;
+}): JSX.Element => {
   const [form] = useForm();
   const [grade, setGrade] = useState(info?.human_feedback?.grade || 0);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState(defaultEditing);
 
   const activeStars = [];
   const passiveStars = [];
@@ -303,6 +328,8 @@ const HandleGrade = ({ info, beautyUid }: { info: Feedback; beautyUid: string })
     onEdit();
   }, [grade, onEdit]);
 
+  const [includeInRegen, setIncludeInRegen] = useState(info?.human_feedback?.include_in_regen);
+
   return (
     <Form form={form}>
       <div className={styles.singleGrade}>
@@ -329,9 +356,7 @@ const HandleGrade = ({ info, beautyUid }: { info: Feedback; beautyUid: string })
               {activeStars.map((elem) => elem)}
             </div>
             <div className={styles.gradeValue}>{grade}/5</div>
-            {info?.human_feedback?.include_in_regen && (
-              <div className={styles.gradeInclude}>Включить в регенерацию</div>
-            )}
+            {includeInRegen && <div className={styles.gradeInclude}>Включить в регенерацию</div>}
           </div>
         </div>
         <div className={styles.gradeBlock}>
@@ -406,6 +431,32 @@ const HandleGrade = ({ info, beautyUid }: { info: Feedback; beautyUid: string })
             <TextArea placeholder="Описание" disabled={!isEditing} onBlur={onEdit} />
           </Form.Item>
         </div>
+        {isEditing && (
+          <>
+            <div className={styles.regenCheck}>
+              <Form.Item
+                name={'include_in_regen'}
+                initialValue={info?.human_feedback?.include_in_regen}
+                valuePropName="checked"
+              >
+                <Checkbox
+                  className={styles.gradeCheckbox}
+                  disabled={!isEditing}
+                  onChange={(e) => {
+                    onEdit();
+                    setIncludeInRegen(e.target.checked);
+                  }}
+                >
+                  Включить исправления в регенерацию
+                </Checkbox>
+              </Form.Item>
+            </div>
+            <div className={styles.delete} onClick={deleteGrade}>
+              <Trash className={styles.gradeTrash} />
+              Удалить аннотацию
+            </div>
+          </>
+        )}
       </div>
     </Form>
   );

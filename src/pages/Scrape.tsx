@@ -30,11 +30,11 @@ export const Scrape = (): JSX.Element => {
           res.data?.map((elem: { uid: string; title: string }) => ({
             id: elem.uid,
             pId: 0,
-            value: elem.title,
+            value: elem.uid,
             title: elem.title,
             selectable: false,
             nestLevel: 0,
-            key: elem.title,
+            key: elem.uid,
           })),
         );
       });
@@ -44,12 +44,12 @@ export const Scrape = (): JSX.Element => {
     return {
       id: elem.uid,
       pId: id,
-      value: elem.title,
+      value: elem.uid,
       title: elem.title,
       isLeaf: nestLevel > 0,
       selectable: nestLevel > 0,
       nestLevel: nestLevel + 1,
-      key: elem.title,
+      key: elem.uid,
     };
   };
 

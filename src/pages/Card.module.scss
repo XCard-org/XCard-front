@@ -297,6 +297,7 @@
   border-radius: 6px;
   background-color: rgba(255, 117, 31, 0.12);
   color: #ff751f;
+  margin-left: auto;
 }
 
 .gradeCheckboxes {
@@ -345,5 +346,25 @@
 
 .input {
   margin-bottom: 12px;
+}
+
+.regenCheck {
+  margin-top: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.delete {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  margin-top: 12px;
+  margin-left: -4px;
+  cursor: pointer;
+}
+
+.gradeTrash {
+  height: 16px;
 }
 

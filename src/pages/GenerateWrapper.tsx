@@ -9,12 +9,13 @@ import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
 import { createSearchParams } from 'react-router-dom';
 import { Card } from '@/pages/Source';
+import { CardItem } from '@/pages/Card';
 
 export const GenerateWrapper = (): JSX.Element => {
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState<string>();
-  const [pageData, setPageData] = useState<Card[]>([]);
+  const [pageData, setPageData] = useState<CardItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [skip, setSkip] = useState<number>(0);
   const [stopLoad, setStopLoad] = useState<boolean>(false);
@@ -40,9 +41,10 @@ export const GenerateWrapper = (): JSX.Element => {
           }
           setPageData((prevData) => [
             ...prevData,
-            ...res.data.map((elem: { card: Card } & Card) =>
-              endpoint === 'card' ? elem.card : elem,
-            ),
+            ...res.data.map((elem: CardItem) => ({
+              ...elem,
+              card: { ...elem?.marketplace_card, ...elem?.card },
+            })),
           ]);
           setSkip((prevSkip) => prevSkip + 50);
         }

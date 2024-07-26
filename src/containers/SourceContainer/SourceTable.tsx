@@ -1,11 +1,11 @@
-import { Card } from '@/pages/Source';
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import axios from 'axios';
 import { useEffect, useState, useCallback } from 'react';
 import { CardTable } from '@/containers/CardTableContainer/CardTable';
+import { CardItem } from '@/pages/Card';
 
 export const SourceTable = (): JSX.Element => {
-  const [data, setData] = useState<Card[]>([]);
+  const [data, setData] = useState<CardItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [skip, setSkip] = useState<number>(0);
   const [stopLoad, setStopLoad] = useState(false);
@@ -27,7 +27,13 @@ export const SourceTable = (): JSX.Element => {
         if (res.data.length < 50) {
           setStopLoad(true);
         }
-        setData((prevData) => [...prevData, ...res.data.map((elem: { card: Card }) => elem.card)]);
+        setData((prevData) => [
+          ...prevData,
+          ...res.data.map((elem: CardItem) => ({
+            ...elem,
+            card: { ...elem?.marketplace_card, ...elem?.card },
+          })),
+        ]);
         setSkip((prevSkip) => prevSkip + 50);
       }
     } catch (error) {
