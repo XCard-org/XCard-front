@@ -51,7 +51,6 @@ export const Source = (): JSX.Element => {
             pId: 0,
             value: elem.uid,
             title: elem.title,
-            selectable: false,
             nestLevel: 0,
             key: elem.uid,
           })),
@@ -84,7 +83,6 @@ export const Source = (): JSX.Element => {
       value: elem.uid,
       title: elem.title,
       isLeaf: nestLevel > 0,
-      selectable: nestLevel > 0,
       nestLevel: nestLevel + 1,
       key: elem.uid,
     };

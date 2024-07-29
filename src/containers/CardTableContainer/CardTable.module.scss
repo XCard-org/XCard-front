@@ -9,3 +9,18 @@
 .cellUid {
   font-family: monospace, monospace;
 }
+
+.tags {
+  display: flex;
+  gap: 6px;
+  max-width: 240px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 2px 8px;
+  border-radius: 5px;
+  background-color: rgba(255, 117, 31, 0.12);
+  font-weight: 500;
+}
+

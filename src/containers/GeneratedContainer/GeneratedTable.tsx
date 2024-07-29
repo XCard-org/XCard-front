@@ -28,6 +28,9 @@ export const GeneratedTable = ({
           params: {
             skip,
             limit: skip + 50,
+            on_marketplace_id: marketplaces,
+            category_id: categories,
+            additional_tag_id: tags,
           },
           headers: {
             Authorization: TOKEN(),

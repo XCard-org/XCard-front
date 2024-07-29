@@ -158,7 +158,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
     // @ts-expect-error correct
     setCard((prev) => ({
       ...prev,
-      ...prev?.human_feedback?.filter((elem) => elem?.human_feedback?.uid === id),
+      human_feedback: prev?.human_feedback?.filter((elem) => elem?.human_feedback?.uid !== id),
     }));
     axios.delete(`${SERVER_ADDRESS}/api/v1/beauty/${card?.beautification?.uid}/feedback/${id}`, {
       headers: {
