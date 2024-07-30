@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useEffect, useState, useCallback } from 'react';
 import { CardTable } from '@/containers/CardTableContainer/CardTable';
 import { CardItem } from '@/pages/Card';
+import qs from 'qs';
 
 export const SourceTable = ({
   tags,
@@ -27,6 +28,9 @@ export const SourceTable = ({
             limit: skip + 50,
             category_id: categories,
             additional_tag_id: tags,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { arrayFormat: 'repeat' });
           },
           headers: {
             Authorization: TOKEN(),

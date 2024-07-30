@@ -89,7 +89,9 @@ export const CardTable = ({
               )}
             </TableCell>
             <TableCell>{elem.card?.title}</TableCell>
-            <TableCell>{elem?.category?.title}</TableCell>
+            <TableCell>
+              {elem?.category?.title && <div className={styles.tag}>{elem?.category?.title}</div>}
+            </TableCell>
             <TableCell>
               <div className={styles.tags}>
                 {elem?.additional_tags?.map((elem) => (

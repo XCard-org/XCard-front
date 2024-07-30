@@ -78,7 +78,7 @@
   font-size: 30px;
   line-height: 36px;
   font-weight: 600;
-  margin-bottom: 20px;
+  margin-bottom: 12px;
 }
 
 .cats {
@@ -366,5 +366,28 @@
 
 .gradeTrash {
   height: 16px;
+}
+
+.link {
+  font-family: monospace, monospace;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.linkArrow {
+  padding: 0px 4px;
+  border-radius: 5px;
+  color: #ff751f;
+  background-color: rgba(255, 117, 31, 0.12);
+  height: 32px;
+  width: 32px;
+}
+
+.time {
+  margin-bottom: 12px;
+  opacity: 0.6;
 }
 

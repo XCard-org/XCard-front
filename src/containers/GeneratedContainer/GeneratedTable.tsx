@@ -4,6 +4,7 @@ import axios from 'axios';
 import { useEffect, useState, useCallback } from 'react';
 import { CardTable } from '@/containers/CardTableContainer/CardTable';
 import { CardItem } from '@/pages/Card';
+import qs from 'qs';
 
 export const GeneratedTable = ({
   marketplaces,
@@ -31,6 +32,9 @@ export const GeneratedTable = ({
             on_marketplace_id: marketplaces,
             category_id: categories,
             additional_tag_id: tags,
+          },
+          paramsSerializer: (params) => {
+            return qs.stringify(params, { arrayFormat: 'repeat' });
           },
           headers: {
             Authorization: TOKEN(),

@@ -5,7 +5,7 @@ import { createSearchParams, useNavigate, useSearchParams } from 'react-router-d
 import styles from './Card.module.scss';
 import { type Card as CardType } from '@/pages/Source';
 import Slash from '../assets/Slash.svg?react';
-import { Pencil, Trash } from 'lucide-react';
+import { ArrowUpRight, Pencil, Trash } from 'lucide-react';
 import classNames from 'classnames';
 import { RootPaths } from '@/pages';
 import Star from '../assets/Star.svg?react';
@@ -16,6 +16,7 @@ import { BackButton } from '@/components/BackButton';
 import { timeAgo } from '@/functions/timeAgo';
 import { AddButton } from '@/components/AddButton';
 import { useForm } from 'antd/es/form/Form';
+import dayjs from 'dayjs';
 
 const getImageSelection = (selected: number, amount: number): [number, number] => {
   if (amount < 4) {
@@ -67,6 +68,7 @@ export type CardItem = {
   beautification?: {
     uid: string;
   };
+  marketplace?: Array<{ name: string }>;
 };
 
 export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
@@ -201,13 +203,19 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
         )}
         <div className={styles.info}>
           <div className={styles.header}>
-            <div className={styles.cardType}>Исходная карточка</div>
+            <div className={styles.cardType}>
+              {card?.marketplace?.[0]?.name || 'Исходная карточка'}
+            </div>
             <div className={styles.activeBtn} onClick={onGenerate}>
               Сгенерировать
             </div>
           </div>
           <div className={styles.title}>{card?.[cardPrefix]?.title}</div>
-
+          <div className={styles.time}>
+            {card?.card?.created_at
+              ? dayjs(card?.card?.created_at).format('HH:mm DD.MM.YYYY')
+              : null}
+          </div>
           <div className={styles.cats}>
             {card?.categories?.map((elem, idx) => (
               <div key={elem.uid}>
@@ -223,7 +231,13 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
           {card?.[cardPrefix]?.source_url && (
             <div className={styles.textBlock}>
               <div className={styles.blockTitle}>Ссылка</div>
-              <div className={styles.link}>{card?.[cardPrefix]?.source_url}</div>
+              <div
+                className={styles.link}
+                onClick={() => window.open(card?.[cardPrefix]?.source_url, '_blank')}
+              >
+                {card?.[cardPrefix]?.source_url}
+                <ArrowUpRight className={styles.linkArrow} />
+              </div>
             </div>
           )}
         </div>
