@@ -75,6 +75,18 @@
   cursor: pointer;
 }
 
+.openMalevich {
+  border-radius: 10px;
+  background-color: #d84674;
+  padding: 6px 10px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  margin-left: auto;
+  cursor: pointer;
+  color: white;
+}
+
 .activeBtn {
   background-color: rgba(255, 117, 31, 1);
   border-radius: 10px;
@@ -413,5 +425,15 @@
   display: flex;
   align-items: center;
   gap: 24px;
+}
+
+.tableBlock {
+  margin-top: 24px;
+}
+
+.tableHeader {
+  font-size: 22px;
+  font-weight: 600;
+  margin-bottom: 12px;
 }
 

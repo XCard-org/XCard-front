@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
@@ -17,6 +18,7 @@ import { timeAgo } from '@/functions/timeAgo';
 import { AddButton } from '@/components/AddButton';
 import { useForm } from 'antd/es/form/Form';
 import dayjs from 'dayjs';
+import { CardTable } from '@/containers/CardTableContainer/CardTable';
 
 const getImageSelection = (selected: number, amount: number): [number, number] => {
   if (amount < 4) {
@@ -69,6 +71,9 @@ export type CardItem = {
     uid: string;
   };
   marketplace?: Array<{ name: string }>;
+  source?: string;
+  sourceType?: 'source' | 'market';
+  generation_pipeline_url?: string;
 };
 
 export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
@@ -108,16 +113,34 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
                   })
                   .then((catData2) => {
                     catData2?.data?.category?.uid && categories.push(catData2?.data?.category);
-                    setCard({ ...res.data, categories });
+
+                    setCard((prev) => ({ ...prev, ...res.data, categories }));
                   });
               } else {
-                setCard({ ...res.data, categories });
+                setCard((prev) => ({ ...prev, ...res.data, categories }));
               }
             });
         } else {
-          setCard({ ...res.data, categories });
+          setCard((prev) => ({ ...prev, ...res.data, categories }));
         }
       });
+
+    if (isMarket) {
+      axios
+        .get(`${SERVER_ADDRESS}/api/v1/marketplacecard/${searchParams.get('id')}/source`, {
+          headers: {
+            Authorization: TOKEN(),
+          },
+        })
+        .then((res) =>
+          // @ts-expect-error no err
+          setCard((prev) => ({
+            ...prev,
+            source: res?.data?.marketplace_card?.uid || res?.data?.card?.uid,
+            sourceType: res?.data?.marketplace_card?.uid ? 'market' : 'source',
+          })),
+        );
+    }
   }, [isMarket, searchParams]);
 
   const onGenerate = (): void => {
@@ -170,12 +193,117 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
   };
 
   const onSource = (): void => {
-    searchParams.set('id', card?.beautification?.uid as string);
+    searchParams.set('id', card?.source as string);
+    setCard(undefined);
     navigate({
-      pathname: RootPaths.card,
+      pathname: card?.sourceType === 'source' ? RootPaths.card : RootPaths.marketcard,
       search: searchParams.toString(),
     });
   };
+
+  const [data, setData] = useState<CardItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [skip, setSkip] = useState<number>(0);
+  const [stopLoad, setStopLoad] = useState(false);
+  const loadMore = useCallback(async () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      if (!stopLoad && skip === data.length) {
+        const res = await axios.get(
+          `${SERVER_ADDRESS}/api/v1/marketplacecard/${searchParams.get('id')}/matched-source`,
+          {
+            params: {
+              skip,
+              limit: skip + 50,
+            },
+            headers: {
+              Authorization: TOKEN(),
+            },
+          },
+        );
+        if (res.data.length < 50) {
+          setStopLoad(true);
+        }
+        setData((prevData) => [
+          ...prevData,
+          ...res.data.map((elem: CardItem) => ({
+            ...elem,
+            card: { ...elem?.marketplace_card, ...elem?.card },
+          })),
+        ]);
+        setSkip((prevSkip) => prevSkip + 50);
+      }
+    } catch (error) {
+      console.error('Failed to load data', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loading, stopLoad, skip, data]);
+
+  useEffect(() => {
+    setData([]);
+    setStopLoad(false);
+    setSkip(0);
+  }, []);
+
+  useEffect(() => {
+    if (!data?.length) {
+      loadMore();
+    }
+  }, [data]);
+
+  const [dataSource, setDataSource] = useState<CardItem[]>([]);
+  const [loadingSource, setLoadingSource] = useState<boolean>(false);
+  const [skipSource, setSkipSource] = useState<number>(0);
+  const [stopLoadSource, setStopLoadSource] = useState(false);
+  const loadMoreSource = useCallback(async () => {
+    if (loadingSource) return;
+    setLoadingSource(true);
+    try {
+      if (!stopLoadSource && skipSource === dataSource.length) {
+        const res = await axios.get(
+          `${SERVER_ADDRESS}/api/v1/card/${searchParams.get('id')}/marketplacecard`,
+          {
+            params: {
+              skip,
+              limit: skipSource + 50,
+            },
+            headers: {
+              Authorization: TOKEN(),
+            },
+          },
+        );
+        if (res.data.length < 50) {
+          setStopLoadSource(true);
+        }
+        setDataSource((prevData) => [
+          ...prevData,
+          ...res.data.map((elem: CardItem) => ({
+            ...elem,
+            card: { ...elem?.marketplace_card, ...elem?.card },
+          })),
+        ]);
+        setSkipSource((prevSkip) => prevSkip + 50);
+      }
+    } catch (error) {
+      console.error('Failed to load data', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [loadingSource, stopLoadSource, skipSource, dataSource]);
+
+  useEffect(() => {
+    setDataSource([]);
+    setStopLoadSource(false);
+    setSkipSource(0);
+  }, []);
+
+  useEffect(() => {
+    if (!data?.length) {
+      loadMoreSource();
+    }
+  }, [dataSource]);
 
   return (
     <div className={styles.card}>
@@ -186,9 +314,16 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
             {card?.marketplace_card ? 'Сгенерированные' : 'Исходные'} / {card?.[cardPrefix]?.uid}
           </div>
         </div>
-        <div className={styles.openSource} onClick={onSource}>
-          Открыть исходную
-        </div>
+        {card?.source && (
+          <div className={styles.openSource} onClick={onSource}>
+            Открыть исходную
+          </div>
+        )}
+        {card?.generation_pipeline_url && (
+          <div className={styles.openMalevich} onClick={onSource}>
+            Открыть Malevich
+          </div>
+        )}
         <div className={styles.activeBtn} onClick={onGenerate}>
           Сгенерировать
         </div>
@@ -295,6 +430,18 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
           </div>
         </div>
       ) : null}
+      {isMarket && (
+        <div className={styles.tableBlock}>
+          <div className={styles.tableHeader}>Карточки с тем же источником</div>
+          <CardTable data={data} loadMore={loadMore} stopLoad={stopLoad} />
+        </div>
+      )}
+      {!isMarket && (
+        <div className={styles.tableBlock}>
+          <div className={styles.tableHeader}>Источник для карточек</div>
+          <CardTable data={dataSource} loadMore={loadMoreSource} stopLoad={stopLoadSource} />
+        </div>
+      )}
     </div>
   );
 };
