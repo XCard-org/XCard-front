@@ -52,6 +52,7 @@
   justify-content: space-between;
   margin-bottom: 20px;
   align-items: center;
+  gap: 16px;
 }
 
 .cardType {
@@ -61,6 +62,17 @@
   font-size: 20px;
   line-height: 26px;
   font-weight: 600;
+}
+
+.openSource {
+  border-radius: 10px;
+  background-color: rgb(240, 240, 240);
+  padding: 6px 10px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 600;
+  margin-left: auto;
+  cursor: pointer;
 }
 
 .activeBtn {
@@ -167,6 +179,12 @@
   display: flex;
   gap: 20px 20px;
   flex-wrap: wrap;
+
+  :global {
+    .ant-form {
+      flex-grow: 1;
+    }
+  }
 }
 
 .singleGrade {
@@ -389,5 +407,11 @@
 .time {
   margin-bottom: 12px;
   opacity: 0.6;
+}
+
+.backBlock {
+  display: flex;
+  align-items: center;
+  gap: 24px;
 }
 

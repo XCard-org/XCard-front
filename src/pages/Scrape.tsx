@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
 import { Input, TreeSelect, TreeSelectProps } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
+import { useActions } from '@/App';
 
 export const Scrape = (): JSX.Element => {
   const [link, setLink] = useState('');
@@ -72,25 +73,11 @@ export const Scrape = (): JSX.Element => {
     setValue(newValue);
   };
 
+  const { callScraper } = useActions();
+
   const onStart = (): void => {
-    axios
-      .post(
-        `${SERVER_ADDRESS}/api/v1/card/?queue_scraping=true`,
-        {
-          source_url: link,
-        },
-        {
-          headers: {
-            Authorization: TOKEN(),
-          },
-          params: {
-            category_id: value,
-          },
-        },
-      )
-      .then(() => {
-        navigate(RootPaths.source);
-      });
+    navigate(RootPaths.source);
+    callScraper(link, value as string);
   };
 
   return (

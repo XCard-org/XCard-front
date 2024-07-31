@@ -11,6 +11,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RootPaths } from '@/pages';
 import { BackButton } from '@/components/BackButton';
 import { CardItem } from '@/pages/Card';
+import { useActions } from '@/App';
 
 type Option = {
   label: string;
@@ -20,9 +21,7 @@ type Option = {
 
 export const Generate = (): JSX.Element => {
   const [markets, setMarkets] = useState([]);
-  const [selectedMarket, setSelectedMarket] = useState();
-  /* const [treeData, setTreeData] = useState<Omit<DefaultOptionType, 'label'>[]>([]);
-  const [value, setValue] = useState<string>();*/
+  const [selectedMarket, setSelectedMarket] = useState<string>();
   const [trends, setTrends] = useState<Array<{ value: string; label: string; level: number }>>([]);
   const [searchParams] = useSearchParams();
   const [card, setCard] = useState<CardItem>();
@@ -157,25 +156,16 @@ export const Generate = (): JSX.Element => {
 
   const navigate = useNavigate();
 
+  const { callGenerator } = useActions();
+
   const onGenerate = (): void => {
-    axios
-      .post(
-        `${SERVER_ADDRESS}/api/v1/${
-          searchParams.get('type') === 'source' ? 'card' : 'marketplacecard'
-        }/${searchParams.get('id')}/beautify`,
-        {
-          on_marketplace_id: selectedMarket,
-          trend_id: trendsValue.map((elem) => elem.value),
-          mock: false,
-          ignore_feedback: false,
-        },
-        {
-          headers: {
-            Authorization: TOKEN(),
-          },
-        },
-      )
-      .then(() => navigate(RootPaths.generated));
+    callGenerator(
+      searchParams.get('type') === 'source' ? 'card' : 'marketplacecard',
+      searchParams.get('id') as string,
+      selectedMarket as string,
+      trendsValue.map((elem) => elem.value) as string[],
+    );
+    navigate(RootPaths.generated);
   };
 
   return (

@@ -169,12 +169,77 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
     });
   };
 
+  const onSource = (): void => {
+    searchParams.set('id', card?.beautification?.uid as string);
+    navigate({
+      pathname: RootPaths.card,
+      search: searchParams.toString(),
+    });
+  };
+
   return (
     <div className={styles.card}>
-      <BackButton />
+      <div className={styles.header}>
+        <div className={styles.backBlock}>
+          <BackButton />
+          <div>
+            {card?.marketplace_card ? 'Сгенерированные' : 'Исходные'} / {card?.[cardPrefix]?.uid}
+          </div>
+        </div>
+        <div className={styles.openSource} onClick={onSource}>
+          Открыть исходную
+        </div>
+        <div className={styles.activeBtn} onClick={onGenerate}>
+          Сгенерировать
+        </div>
+      </div>
       <div className={styles.topBlock}>
+        <div className={styles.blockWrap}>
+          <div className={styles.header}>
+            <div className={styles.cardType}>
+              {card?.marketplace?.[0]?.name || 'Исходная карточка'}
+            </div>
+          </div>
+          <div className={styles.info}>
+            <div className={styles.title}>{card?.[cardPrefix]?.title}</div>
+            <div className={styles.time}>
+              {card?.[cardPrefix]?.created_at
+                ? dayjs(card?.[cardPrefix]?.created_at).format('HH:mm DD.MM.YYYY')
+                : null}
+            </div>
+            <div className={styles.cats}>
+              {card?.categories?.map((elem, idx) => (
+                <div key={elem.uid}>
+                  <div className={styles.cat}>{elem?.title}</div>
+                  {idx !== (card?.categories?.length as number) - 1 && <Slash />}
+                </div>
+              ))}
+            </div>
+            <div className={styles.textBlock}>
+              <div className={styles.blockTitle}>Описание</div>
+              <div className={styles.description}>{card?.[cardPrefix]?.description}</div>
+            </div>
+            {card?.[cardPrefix]?.source_url && (
+              <div className={styles.textBlock}>
+                <div className={styles.blockTitle}>Ссылка</div>
+                <div
+                  className={styles.link}
+                  onClick={() => window.open(card?.[cardPrefix]?.source_url, '_blank')}
+                >
+                  {card?.[cardPrefix]?.source_url}
+                  <ArrowUpRight className={styles.linkArrow} />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
         {card?.[cardPrefix]?.images?.length && (
           <div className={styles.imagesWrap}>
+            <img
+              src={card?.[cardPrefix]?.images[selectedImage]}
+              alt="img"
+              className={styles.image}
+            />
             <div className={styles.images}>
               {card?.[cardPrefix]?.images
                 ?.slice(
@@ -194,53 +259,8 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
                   />
                 ))}
             </div>
-            <img
-              src={card?.[cardPrefix]?.images[selectedImage]}
-              alt="img"
-              className={styles.image}
-            />
           </div>
         )}
-        <div className={styles.info}>
-          <div className={styles.header}>
-            <div className={styles.cardType}>
-              {card?.marketplace?.[0]?.name || 'Исходная карточка'}
-            </div>
-            <div className={styles.activeBtn} onClick={onGenerate}>
-              Сгенерировать
-            </div>
-          </div>
-          <div className={styles.title}>{card?.[cardPrefix]?.title}</div>
-          <div className={styles.time}>
-            {card?.card?.created_at
-              ? dayjs(card?.card?.created_at).format('HH:mm DD.MM.YYYY')
-              : null}
-          </div>
-          <div className={styles.cats}>
-            {card?.categories?.map((elem, idx) => (
-              <div key={elem.uid}>
-                <div className={styles.cat}>{elem?.title}</div>
-                {idx !== (card?.categories?.length as number) - 1 && <Slash />}
-              </div>
-            ))}
-          </div>
-          <div className={styles.textBlock}>
-            <div className={styles.blockTitle}>Описание</div>
-            <div className={styles.description}>{card?.[cardPrefix]?.description}</div>
-          </div>
-          {card?.[cardPrefix]?.source_url && (
-            <div className={styles.textBlock}>
-              <div className={styles.blockTitle}>Ссылка</div>
-              <div
-                className={styles.link}
-                onClick={() => window.open(card?.[cardPrefix]?.source_url, '_blank')}
-              >
-                {card?.[cardPrefix]?.source_url}
-                <ArrowUpRight className={styles.linkArrow} />
-              </div>
-            </div>
-          )}
-        </div>
       </div>
       {card?.property ? (
         <div className={styles.bottomBlock}>

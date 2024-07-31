@@ -68,9 +68,9 @@ export const CardTable = ({
           <TableHead>Название</TableHead>
           <TableHead>Категория</TableHead>
           <TableHead>Доп. тег</TableHead>
+          {isMarket && <TableHead>Маркетплейс</TableHead>}
           <TableHead>Артикул</TableHead>
           <TableHead>Бренд</TableHead>
-          <TableHead>Ссылка</TableHead>
           <TableHead>Цена</TableHead>
           <TableHead>Валюта</TableHead>
           <TableHead>UID</TableHead>
@@ -99,9 +99,9 @@ export const CardTable = ({
                 ))}
               </div>
             </TableCell>
+            {isMarket && <TableCell>{elem.marketplace?.[0]?.name}</TableCell>}
             <TableCell>{elem.card?.internal_pim_id}</TableCell>
             <TableCell>{elem.card?.brand}</TableCell>
-            <TableCell>{elem.card?.source_url}</TableCell>
             <TableCell>{elem.card?.price}</TableCell>
             <TableCell>{elem.card?.currency}</TableCell>
             <TableCell className={styles.cellUid}>{elem.card?.uid?.slice(-4)}</TableCell>
