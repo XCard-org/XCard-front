@@ -260,17 +260,23 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
     }
   }, [loading, stopLoad, skip, data]);
 
+  const [reload, setReload] = useState(0);
+
   useEffect(() => {
-    setData([]);
+    const loadAfter = !data?.length;
     setStopLoad(false);
     setSkip(0);
+    setData([]);
+    loadAfter && setReload((prev) => prev + 1);
   }, [card?.marketplace_card?.uid, card?.card?.uid]);
 
   useEffect(() => {
     if (!data?.length) {
       loadMore();
     }
-  }, [data]);
+  }, [data, reload]);
+
+  const [reloadSource, setReloadSource] = useState(0);
 
   const [additionalTags, setAdditionalTags] = useState([]);
 
@@ -312,19 +318,29 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
     } finally {
       setLoading(false);
     }
-  }, [loadingSource, stopLoadSource, skipSource, dataSource, card]);
+  }, [
+    loadingSource,
+    stopLoadSource,
+    skipSource,
+    dataSource,
+    card?.marketplace_card?.uid,
+    card?.card?.uid,
+  ]);
 
   useEffect(() => {
+    const goReload = !data?.length;
     setDataSource([]);
     setStopLoadSource(false);
     setSkipSource(0);
+    goReload && setReloadSource((prev) => prev + 1);
+    goReload && setLoadingSource(false);
   }, [card?.marketplace_card?.uid, card?.card?.uid]);
 
   useEffect(() => {
     if (!data?.length) {
       loadMoreSource();
     }
-  }, [dataSource]);
+  }, [dataSource, reloadSource]);
 
   const openMarket = (): void => {
     if (card?.marketplace?.[0]?.name) {
