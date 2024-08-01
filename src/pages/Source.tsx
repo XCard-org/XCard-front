@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
 import { SourceTable } from '@/containers/SourceContainer/SourceTable';
 import { Select, TreeSelect, TreeSelectProps } from 'antd';
-import { useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { DefaultOptionType } from 'antd/es/select';
@@ -32,7 +32,9 @@ export const Source = (): JSX.Element => {
   const [selectedCategory, setSelectedCategory] = useState<string[]>(
     searchParams.get('category') ? [searchParams.get('category') as string] : [],
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    searchParams.get('tag') ? [searchParams.get('tag') as string] : [],
+  );
 
   const onScrape = (): void => {
     navigate(RootPaths.scrape);
@@ -109,6 +111,14 @@ export const Source = (): JSX.Element => {
         );
       });
 
+  const onCategoryClick = (id: string): void => {
+    setSelectedCategory([id]);
+  };
+
+  const onTagClick = (id: string): void => {
+    setSelectedTags([id]);
+  };
+
   return (
     <div className={styles.source}>
       <div className={styles.header}>
@@ -140,8 +150,25 @@ export const Source = (): JSX.Element => {
           Соскрейпить
         </div>
       </div>
-      <SourceTable tags={selectedTags} categories={selectedCategory} />
+      <TableContext.Provider value={{ onCategoryClick, onTagClick }}>
+        <SourceTable tags={selectedTags} categories={selectedCategory} />
+      </TableContext.Provider>
     </div>
   );
+};
+
+interface TableContextType {
+  onCategoryClick: (id: string) => void;
+  onTagClick: (id: string) => void;
+}
+
+export const TableContext = createContext<TableContextType | undefined>(undefined);
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useTable = (): TableContextType | Record<string, never> => {
+  const context = useContext(TableContext);
+  if (!context) {
+    return {};
+  } else return context;
 };
 

@@ -19,7 +19,7 @@ import { AddButton } from '@/components/AddButton';
 import { useForm } from 'antd/es/form/Form';
 import dayjs from 'dayjs';
 import { CardTable } from '@/containers/CardTableContainer/CardTable';
-import { DefaultOptionType } from 'antd/es/select';
+import Select, { DefaultOptionType } from 'antd/es/select';
 
 const getImageSelection = (selected: number, amount: number): [number, number] => {
   if (amount < 4) {
@@ -72,7 +72,7 @@ export type CardItem = {
     uid: string;
   };
   marketplace?: Array<{ name: string; url: string; uid: string }>;
-  source?: string;
+  source?: CardType;
   sourceType?: 'source' | 'market';
   generation_pipeline_url?: string;
 };
@@ -137,11 +137,29 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
           // @ts-expect-error no err
           setCard((prev) => ({
             ...prev,
-            source: res?.data?.marketplace_card?.uid || res?.data?.card?.uid,
+            source: res?.data?.marketplace_card || res?.data?.card,
             sourceType: res?.data?.marketplace_card?.uid ? 'market' : 'source',
           })),
         );
     }
+
+    axios
+      .get(`${SERVER_ADDRESS}/api/v1/tag/`, {
+        params: {
+          is_main_kb: false,
+        },
+        headers: {
+          Authorization: TOKEN(),
+        },
+      })
+      .then((res) => {
+        setAdditionalTags(
+          res.data?.map((elem: { title: string; uid: string }) => ({
+            label: elem?.title,
+            value: elem?.uid,
+          })),
+        );
+      });
   }, [isMarket, searchParams, card?.category?.uid]);
 
   const onGenerate = (): void => {
@@ -194,7 +212,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
   };
 
   const onSource = (): void => {
-    searchParams.set('id', card?.source as string);
+    searchParams.set('id', card?.source?.uid as string);
     setCard(undefined);
     navigate({
       pathname: card?.sourceType === 'source' ? RootPaths.card : RootPaths.marketcard,
@@ -246,13 +264,15 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
     setData([]);
     setStopLoad(false);
     setSkip(0);
-  }, []);
+  }, [card?.marketplace_card?.uid, card?.card?.uid]);
 
   useEffect(() => {
     if (!data?.length) {
       loadMore();
     }
   }, [data]);
+
+  const [additionalTags, setAdditionalTags] = useState([]);
 
   const [dataSource, setDataSource] = useState<CardItem[]>([]);
   const [loadingSource, setLoadingSource] = useState<boolean>(false);
@@ -298,7 +318,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
     setDataSource([]);
     setStopLoadSource(false);
     setSkipSource(0);
-  }, []);
+  }, [card?.marketplace_card?.uid, card?.card?.uid]);
 
   useEffect(() => {
     if (!data?.length) {
@@ -322,6 +342,15 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
       pathname: card?.marketplace_card?.uid ? RootPaths.generated : RootPaths.source,
       search: createSearchParams({
         category: uid,
+      }).toString(),
+    });
+  };
+
+  const openTag = (uid: string): void => {
+    navigate({
+      pathname: card?.marketplace_card?.uid ? RootPaths.generated : RootPaths.source,
+      search: createSearchParams({
+        tag: uid,
       }).toString(),
     });
   };
@@ -469,11 +498,6 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
             {card?.marketplace_card ? 'Сгенерированные' : 'Исходные'} / {card?.[cardPrefix]?.uid}
           </div>
         </div>
-        {card?.source && (
-          <div className={styles.openSource} onClick={onSource}>
-            Открыть исходную
-          </div>
-        )}
         {card?.generation_pipeline_url && (
           <div
             className={styles.openMalevich}
@@ -490,11 +514,31 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
         <div className={styles.blockWrap}>
           <div className={styles.header}>
             <div className={styles.cardType} onClick={openMarket}>
-              {card?.marketplace?.[0]?.name || 'Исходная карточка'}
+              {card?.marketplace?.[0]?.name || card?.marketplace_card?.uid
+                ? 'Сгенерированная карточка'
+                : 'Исходная карточка'}
             </div>
           </div>
           <div className={styles.info}>
             <div className={styles.title}>{card?.[cardPrefix]?.title}</div>
+            {card?.source?.uid ? (
+              <div className={styles.sourceBlock} onClick={onSource}>
+                <div className={styles.sourceElem}>
+                  <div className={styles.sourceName}>Исходная карточка</div>
+                  <div className={styles.sourceValue}>{card?.source?.title}</div>
+                </div>
+
+                {card?.source?.created_at && (
+                  <div className={styles.sourceElem}>
+                    <div className={styles.sourceName}>Добавлена</div>
+                    <div className={styles.sourceValue}>
+                      {dayjs(card?.source?.created_at).format('HH:mm DD.MM.YYYY')}
+                    </div>
+                  </div>
+                )}
+                <ArrowUpRight className={styles.sourceArrow} />
+              </div>
+            ) : null}
             <div className={styles.time}>
               {card?.[cardPrefix]?.created_at
                 ? dayjs(card?.[cardPrefix]?.created_at).format('HH:mm DD.MM.YYYY')
@@ -525,21 +569,19 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
             <div className={styles.cats}>
               {card?.additional_tags?.map((elem, idx) => (
                 <div key={elem.uid}>
-                  <div className={styles.cat} onClick={() => openCategory(elem.uid)}>
+                  <div className={styles.cat} onClick={() => openTag(elem.uid)}>
                     {elem?.title}
                   </div>
                   {idx !== (card?.categories?.length as number) - 1 && <Slash />}
                 </div>
               ))}
               <AddButton>
-                <TreeSelect
-                  treeDataSimpleMode
-                  style={{ width: '100%' }}
-                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
-                  placeholder="Выберите категорию"
-                  onChange={onChange}
-                  loadData={onLoadData}
-                  treeData={treeData}
+                <Select
+                  popupMatchSelectWidth={false}
+                  options={additionalTags}
+                  placeholder="Дополнительный тег"
+                  className={styles.selectTag}
+                  onChange={(e) => onChange(e)}
                 />
               </AddButton>
             </div>
@@ -634,13 +676,18 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
       {isMarket && (
         <div className={styles.tableBlock}>
           <div className={styles.tableHeader}>Карточки с тем же источником</div>
-          <CardTable data={data} loadMore={loadMore} stopLoad={stopLoad} />
+          <CardTable data={data} loadMore={loadMore} stopLoad={stopLoad} isMarket={true} />
         </div>
       )}
       {!isMarket && (
         <div className={styles.tableBlock}>
           <div className={styles.tableHeader}>Источник для карточек</div>
-          <CardTable data={dataSource} loadMore={loadMoreSource} stopLoad={stopLoadSource} />
+          <CardTable
+            data={dataSource}
+            loadMore={loadMoreSource}
+            stopLoad={stopLoadSource}
+            isMarket={true}
+          />
         </div>
       )}
     </div>

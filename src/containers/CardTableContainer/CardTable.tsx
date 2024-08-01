@@ -8,7 +8,7 @@ import {
 } from '@/components/ui/table';
 import Image from '../../assets/Image.svg?react';
 import styles from './CardTable.module.scss';
-import { Card } from '@/pages/Source';
+import { Card, useTable } from '@/pages/Source';
 import { useNavigate } from 'react-router';
 import { RootPaths } from '@/pages';
 import { createSearchParams } from 'react-router-dom';
@@ -58,6 +58,8 @@ export const CardTable = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, [handleScroll, stopLoad]);
 
+  const { onTagClick, onCategoryClick } = useTable();
+
   return (
     <Table className={styles.table}>
       <TableHeader>
@@ -90,12 +92,29 @@ export const CardTable = ({
             </TableCell>
             <TableCell>{elem.card?.title}</TableCell>
             <TableCell>
-              {elem?.category?.title && <div className={styles.tag}>{elem?.category?.title}</div>}
+              {elem?.category?.title && (
+                <div
+                  className={styles.tag}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCategoryClick?.(elem?.category?.uid as string);
+                  }}
+                >
+                  {elem?.category?.title}
+                </div>
+              )}
             </TableCell>
             <TableCell>
               <div className={styles.tags}>
                 {elem?.additional_tags?.map((elem) => (
-                  <div className={styles.tag} key={elem?.uid}>
+                  <div
+                    className={styles.tag}
+                    key={elem?.uid}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onTagClick?.(elem?.uid);
+                    }}
+                  >
                     {elem?.title}
                   </div>
                 ))}

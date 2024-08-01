@@ -8,6 +8,7 @@ import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { Select, TreeSelect, TreeSelectProps } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
 import { useSearchParams } from 'react-router-dom';
+import { TableContext } from '@/pages/Source';
 
 export const Generated = (): JSX.Element => {
   const navigate = useNavigate();
@@ -21,7 +22,9 @@ export const Generated = (): JSX.Element => {
   const [selectedCategory, setSelectedCategory] = useState<string[]>(
     searchParams.get('category') ? [searchParams.get('category') as string] : [],
   );
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<string[]>(
+    searchParams.get('tag') ? [searchParams.get('tag') as string] : [],
+  );
 
   const onGenerate = (): void => {
     navigate(RootPaths.generatetables);
@@ -116,6 +119,14 @@ export const Generated = (): JSX.Element => {
         );
       });
 
+  const onCategoryClick = (id: string): void => {
+    setSelectedCategory([id]);
+  };
+
+  const onTagClick = (id: string): void => {
+    setSelectedTags([id]);
+  };
+
   return (
     <div className={styles.source}>
       <div className={styles.header}>
@@ -156,11 +167,13 @@ export const Generated = (): JSX.Element => {
           Сгенерировать
         </div>
       </div>
-      <GeneratedTable
-        marketplaces={selectedMarketplaces}
-        categories={selectedCategory}
-        tags={selectedTags}
-      />
+      <TableContext.Provider value={{ onCategoryClick, onTagClick }}>
+        <GeneratedTable
+          marketplaces={selectedMarketplaces}
+          categories={selectedCategory}
+          tags={selectedTags}
+        />
+      </TableContext.Provider>
     </div>
   );
 };

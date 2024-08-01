@@ -453,3 +453,46 @@
   margin-bottom: 12px;
 }
 
+.sourceBlock {
+  border: 1px solid #eee;
+  border-radius: 10px;
+  padding: 10px;
+  display: flex;
+  width: fit-content;
+  gap: 12px;
+  align-items: center;
+  cursor: pointer;
+
+  &:hover {
+    .sourceArrow {
+      opacity: 1;
+    }
+  }
+}
+
+.sourceName {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.sourceValue {
+  font-size: 16px;
+  line-height: 18px;
+  font-weight: 500;
+}
+
+.sourceElem {
+  &:not(:last-child) {
+    border-right: 1px solid #eee;
+    padding-right: 12px;
+  }
+}
+
+.sourceArrow {
+  margin-left: -4px;
+  opacity: 0.24;
+}
+
+.selectTag {
+  width: 100%;
+}
