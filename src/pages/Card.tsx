@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import { RootPaths } from '@/pages';
 import Star from '../assets/Star.svg?react';
 import ActiveStar from '../assets/ActiveStar.svg?react';
-import { Checkbox, Form, Input } from 'antd';
+import { Checkbox, Form, Input, TreeSelect, TreeSelectProps } from 'antd';
 import TextArea from 'antd/es/input/TextArea';
 import { BackButton } from '@/components/BackButton';
 import { timeAgo } from '@/functions/timeAgo';
@@ -19,6 +19,7 @@ import { AddButton } from '@/components/AddButton';
 import { useForm } from 'antd/es/form/Form';
 import dayjs from 'dayjs';
 import { CardTable } from '@/containers/CardTableContainer/CardTable';
+import { DefaultOptionType } from 'antd/es/select';
 
 const getImageSelection = (selected: number, amount: number): [number, number] => {
   if (amount < 4) {
@@ -70,7 +71,7 @@ export type CardItem = {
   beautification?: {
     uid: string;
   };
-  marketplace?: Array<{ name: string }>;
+  marketplace?: Array<{ name: string; url: string; uid: string }>;
   source?: string;
   sourceType?: 'source' | 'market';
   generation_pipeline_url?: string;
@@ -141,7 +142,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
           })),
         );
     }
-  }, [isMarket, searchParams]);
+  }, [isMarket, searchParams, card?.category?.uid]);
 
   const onGenerate = (): void => {
     navigate({
@@ -291,7 +292,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
     } finally {
       setLoading(false);
     }
-  }, [loadingSource, stopLoadSource, skipSource, dataSource]);
+  }, [loadingSource, stopLoadSource, skipSource, dataSource, card]);
 
   useEffect(() => {
     setDataSource([]);
@@ -304,6 +305,160 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
       loadMoreSource();
     }
   }, [dataSource]);
+
+  const openMarket = (): void => {
+    if (card?.marketplace?.[0]?.name) {
+      navigate({
+        pathname: RootPaths.generated,
+        search: createSearchParams({
+          market: card?.marketplace?.[0]?.uid,
+        }).toString(),
+      });
+    }
+  };
+
+  const openCategory = (uid: string): void => {
+    navigate({
+      pathname: card?.marketplace_card?.uid ? RootPaths.generated : RootPaths.source,
+      search: createSearchParams({
+        category: uid,
+      }).toString(),
+    });
+  };
+
+  const [treeData, setTreeData] = useState<Omit<DefaultOptionType, 'label'>[]>([]);
+
+  useEffect(() => {
+    axios
+      .get(`${SERVER_ADDRESS}/api/v1/tag/`, {
+        params: {
+          root: true,
+        },
+        headers: {
+          Authorization: TOKEN(),
+        },
+      })
+      .then((res) => {
+        setTreeData(
+          res.data?.map((elem: { uid: string; title: string }) => ({
+            id: elem.uid,
+            pId: 0,
+            value: elem.uid,
+            title: elem.title,
+            nestLevel: 0,
+            key: elem.uid,
+          })),
+        );
+      });
+  }, []);
+
+  const genTreeNode = (nestLevel: number, id: string, elem: { title: string; uid: string }) => {
+    return {
+      id: elem.uid,
+      pId: id,
+      value: elem.uid,
+      title: elem.title,
+      isLeaf: nestLevel > 0,
+      nestLevel: nestLevel + 1,
+      key: elem.uid,
+    };
+  };
+
+  const onLoadData: TreeSelectProps['loadData'] = ({ id, nestLevel }) =>
+    axios
+      .get(`${SERVER_ADDRESS}/api/v1/tag/${id}/children`, {
+        headers: {
+          Authorization: TOKEN(),
+        },
+      })
+      .then((res) => {
+        setTreeData(
+          treeData.concat(
+            res.data.map((elem: { title: string; uid: string }) =>
+              genTreeNode(nestLevel, id, elem),
+            ),
+          ),
+        );
+      });
+
+  const onChange = (newValue: string) => {
+    axios
+      .post(
+        `${SERVER_ADDRESS}/api/v1/${isMarket ? 'marketplace' : ''}card/${searchParams.get(
+          'id',
+        )}/additional-tag`,
+        {
+          uid: searchParams.get('id'),
+          is_main_kb: false,
+        },
+        {
+          params: {
+            tag_id: newValue,
+          },
+          headers: {
+            Authorization: TOKEN(),
+          },
+        },
+      )
+      .then((res) => {
+        // @ts-expect-error err
+        setCard((prev) => ({
+          ...prev,
+          additional_tags: prev?.additional_tags?.length
+            ? // eslint-disable-next-line no-unsafe-optional-chaining
+              [...prev?.additional_tags, res.data]
+            : [res.data],
+        }));
+      });
+  };
+
+  const setCategory = (newValue: string): void => {
+    axios
+      .post(
+        `${SERVER_ADDRESS}/api/v1/${isMarket ? 'marketplace' : ''}card/${searchParams.get(
+          'id',
+        )}/category`,
+        {
+          uid: searchParams.get('id'),
+          is_main_kb: false,
+        },
+        {
+          params: {
+            category_id: newValue,
+          },
+          headers: {
+            Authorization: TOKEN(),
+          },
+        },
+      )
+      .then((res) => {
+        // @ts-expect-error err
+        setCard((prev) => ({
+          ...prev,
+          category: res.data,
+        }));
+      });
+  };
+
+  const onGradeValueChange = (id: string, value: number): void => {
+    // @ts-expect-error no err
+    setCard((prev) => ({
+      ...prev,
+      human_feedback: prev?.human_feedback?.map((elem) => {
+        if (elem.human_feedback?.uid === id) {
+          return {
+            ...elem,
+            human_feedback: {
+              ...elem.human_feedback,
+              grade: value,
+            },
+          };
+        } else {
+          return elem;
+        }
+      }),
+    }));
+  };
 
   return (
     <div className={styles.card}>
@@ -320,7 +475,10 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
           </div>
         )}
         {card?.generation_pipeline_url && (
-          <div className={styles.openMalevich} onClick={onSource}>
+          <div
+            className={styles.openMalevich}
+            onClick={() => window.open(card?.generation_pipeline_url, '_blank')}
+          >
             Открыть Malevich
           </div>
         )}
@@ -331,7 +489,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
       <div className={styles.topBlock}>
         <div className={styles.blockWrap}>
           <div className={styles.header}>
-            <div className={styles.cardType}>
+            <div className={styles.cardType} onClick={openMarket}>
               {card?.marketplace?.[0]?.name || 'Исходная карточка'}
             </div>
           </div>
@@ -345,10 +503,45 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
             <div className={styles.cats}>
               {card?.categories?.map((elem, idx) => (
                 <div key={elem.uid}>
-                  <div className={styles.cat}>{elem?.title}</div>
+                  <div className={styles.cat} onClick={() => openCategory(elem.uid)}>
+                    {elem?.title}
+                  </div>
                   {idx !== (card?.categories?.length as number) - 1 && <Slash />}
                 </div>
               ))}
+              <AddButton customIcon={<Pencil className={styles.pencil} />}>
+                <TreeSelect
+                  treeDataSimpleMode
+                  style={{ width: '100%' }}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  placeholder="Выберите категорию"
+                  onChange={setCategory}
+                  loadData={onLoadData}
+                  treeData={treeData}
+                />
+              </AddButton>
+            </div>
+            <div className={styles.addCats}>Доп. теги</div>
+            <div className={styles.cats}>
+              {card?.additional_tags?.map((elem, idx) => (
+                <div key={elem.uid}>
+                  <div className={styles.cat} onClick={() => openCategory(elem.uid)}>
+                    {elem?.title}
+                  </div>
+                  {idx !== (card?.categories?.length as number) - 1 && <Slash />}
+                </div>
+              ))}
+              <AddButton>
+                <TreeSelect
+                  treeDataSimpleMode
+                  style={{ width: '100%' }}
+                  dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+                  placeholder="Выберите категорию"
+                  onChange={onChange}
+                  loadData={onLoadData}
+                  treeData={treeData}
+                />
+              </AddButton>
             </div>
             <div className={styles.textBlock}>
               <div className={styles.blockTitle}>Описание</div>
@@ -368,7 +561,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
             )}
           </div>
         </div>
-        {card?.[cardPrefix]?.images?.length && (
+        {card?.[cardPrefix]?.images?.length ? (
           <div className={styles.imagesWrap}>
             <img
               src={card?.[cardPrefix]?.images[selectedImage]}
@@ -395,7 +588,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
                 ))}
             </div>
           </div>
-        )}
+        ) : null}
       </div>
       {card?.property ? (
         <div className={styles.bottomBlock}>
@@ -415,6 +608,13 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
         <div className={styles.grade}>
           <div className={styles.gradeTitle}>
             Ручная оценка
+            {card?.human_feedback?.length && (
+              <div className={styles.gradeValue}>
+                {card?.human_feedback?.reduce((acc, elem) => acc + elem?.human_feedback?.grade, 0) /
+                  card?.human_feedback?.length}
+                /5
+              </div>
+            )}
             <AddButton onClick={addGrade} />
           </div>
           <div className={styles.grades}>
@@ -425,6 +625,7 @@ export const Card = ({ isMarket }: { isMarket?: boolean }): JSX.Element => {
                 key={elem?.human_feedback?.uid}
                 deleteGrade={() => deleteGrade(elem?.human_feedback?.uid)}
                 defaultEditing={elem?.defaultEditing as boolean}
+                onGradeValueChange={onGradeValueChange}
               />
             ))}
           </div>
@@ -451,11 +652,13 @@ const HandleGrade = ({
   beautyUid,
   deleteGrade,
   defaultEditing,
+  onGradeValueChange,
 }: {
   info: Feedback;
   beautyUid: string;
   deleteGrade: () => void;
   defaultEditing: boolean;
+  onGradeValueChange: (id: string, value: number) => void;
 }): JSX.Element => {
   const [form] = useForm();
   const [grade, setGrade] = useState(info?.human_feedback?.grade || 0);
@@ -508,6 +711,7 @@ const HandleGrade = ({
 
   useEffect(() => {
     onEdit();
+    onGradeValueChange(info?.human_feedback?.uid, grade);
   }, [grade, onEdit]);
 
   const [includeInRegen, setIncludeInRegen] = useState(info?.human_feedback?.include_in_regen);

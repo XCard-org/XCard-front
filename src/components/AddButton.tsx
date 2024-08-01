@@ -8,10 +8,12 @@ export const AddButton = ({
   onClick,
   className,
   children,
+  customIcon,
 }: {
   onClick?: () => void;
   className?: string;
   children?: JSX.Element;
+  customIcon?: JSX.Element;
 }): JSX.Element => {
   return (
     <Popover>
@@ -22,7 +24,7 @@ export const AddButton = ({
           className={classNames(styles.add, className)}
           onClick={onClick}
         >
-          <Plus />
+          {customIcon || <Plus />}
         </Button>
       </PopoverTrigger>
       <PopoverContent className={classNames('w-80', styles.tooltipRoot)}>{children}</PopoverContent>

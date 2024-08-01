@@ -62,6 +62,7 @@
   font-size: 20px;
   line-height: 26px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 .openSource {
@@ -109,7 +110,7 @@
   display: flex;
   gap: 12px;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
 
 .cat {
@@ -118,6 +119,21 @@
   color: #ff751f;
   padding: 6px 10px;
   font-weight: 500;
+  cursor: pointer;
+}
+
+.gradeValue {
+  margin-bottom: -3px;
+}
+
+.pencil {
+  height: 12px;
+}
+
+.addCats {
+  opacity: 0.6;
+  font-size: 12px;
+  margin-bottom: 8px;
 }
 
 .textBlock {

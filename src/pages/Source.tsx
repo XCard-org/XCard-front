@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { DefaultOptionType } from 'antd/es/select';
+import { useSearchParams } from 'react-router-dom';
 
 export type Card = {
   uid: string;
@@ -25,9 +26,12 @@ export type Card = {
 
 export const Source = (): JSX.Element => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [additionalTags, setAdditionalTags] = useState([]);
   const [treeData, setTreeData] = useState<Omit<DefaultOptionType, 'label'>[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(
+    searchParams.get('category') ? [searchParams.get('category') as string] : [],
+  );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const onScrape = (): void => {
@@ -82,7 +86,7 @@ export const Source = (): JSX.Element => {
       pId: id,
       value: elem.uid,
       title: elem.title,
-      isLeaf: nestLevel > 0,
+      //isLeaf: nestLevel > 0,
       nestLevel: nestLevel + 1,
       key: elem.uid,
     };
@@ -120,6 +124,7 @@ export const Source = (): JSX.Element => {
             multiple={true}
             popupMatchSelectWidth={false}
             className={styles.selectCat}
+            value={selectedCategory}
           />
           <Select
             popupMatchSelectWidth={false}
@@ -128,6 +133,7 @@ export const Source = (): JSX.Element => {
             mode="multiple"
             className={styles.selectTag}
             onChange={(e) => setSelectedTags(e)}
+            value={selectedTags}
           />
         </div>
         <div className={styles.scrape} onClick={onScrape}>

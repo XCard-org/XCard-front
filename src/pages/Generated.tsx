@@ -7,14 +7,20 @@ import { useEffect, useState } from 'react';
 import { SERVER_ADDRESS, TOKEN } from '@/constants';
 import { Select, TreeSelect, TreeSelectProps } from 'antd';
 import { DefaultOptionType } from 'antd/es/select';
+import { useSearchParams } from 'react-router-dom';
 
 export const Generated = (): JSX.Element => {
   const navigate = useNavigate();
-  const [marketplaceOptions, setMarketplaceOptions] = useState([]);
-  const [selectedMarketplaces, setSelectedMarketplaces] = useState([]);
+  const [searchParams] = useSearchParams();
+  const [marketplaceOptions, setMarketplaceOptions] = useState();
+  const [selectedMarketplaces, setSelectedMarketplaces] = useState<string[]>(
+    searchParams.get('market') ? [searchParams.get('market') as string] : [],
+  );
   const [additionalTags, setAdditionalTags] = useState([]);
   const [treeData, setTreeData] = useState<Omit<DefaultOptionType, 'label'>[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string[]>(
+    searchParams.get('category') ? [searchParams.get('category') as string] : [],
+  );
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
   const onGenerate = (): void => {
@@ -122,6 +128,7 @@ export const Generated = (): JSX.Element => {
             mode="multiple"
             className={styles.selectMarket}
             onChange={(e) => setSelectedMarketplaces(e)}
+            value={selectedMarketplaces}
           />
           <TreeSelect
             treeDataSimpleMode
@@ -133,6 +140,7 @@ export const Generated = (): JSX.Element => {
             multiple={true}
             popupMatchSelectWidth={false}
             className={styles.selectCat}
+            value={selectedCategory}
           />
           <Select
             popupMatchSelectWidth={false}
@@ -141,6 +149,7 @@ export const Generated = (): JSX.Element => {
             mode="multiple"
             className={styles.selectTag}
             onChange={(e) => setSelectedTags(e)}
+            value={selectedTags}
           />
         </div>
         <div className={styles.scrape} onClick={onGenerate}>
